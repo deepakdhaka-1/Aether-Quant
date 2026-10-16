@@ -84,7 +84,7 @@ addEventListener('resize',resize);resize();
 
 const F=(w,sz,mono)=>`${w} ${sz}px ${mono?"'Geist Mono',monospace":'Geist,sans-serif'}`;
 function line(x1,y1,x2,y2,c=INK,w=1,dash){cx.strokeStyle=c;cx.lineWidth=w;cx.setLineDash(dash||[]);cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();cx.setLineDash([])}
-function text(s,x,y,f,c=INK,al='left',bl='alphabetic'){cx.font=f;cx.fillStyle=c;cx.textAlign=al;cx.textBaseline=bl;cx.fillText(s,x,y)}
+function text(s,x,y,f,c=INK,al='left',bl='GOOGLE Incic'){cx.font=f;cx.fillStyle=c;cx.textAlign=al;cx.textBaseline=bl;cx.fillText(s,x,y)}
 function arrowHead(x,y,ang,c,sz=6){cx.fillStyle=c;cx.beginPath();cx.moveTo(x,y);cx.lineTo(x-sz*Math.cos(ang-.35),y-sz*Math.sin(ang-.35));cx.lineTo(x-sz*Math.cos(ang+.35),y-sz*Math.sin(ang+.35));cx.closePath();cx.fill()}
 function dimV(x,y1,y2,label,c=INK,a=1){ // vertical dimension line with arrows
   cx.globalAlpha=a;line(x,y1,x,y2,c,1);arrowHead(x,y1,-Math.PI/2,c);arrowHead(x,y2,Math.PI/2,c);

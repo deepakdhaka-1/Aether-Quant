@@ -8,6 +8,7 @@ Migrations are applied in order and must never be edited once applied; add a new
 | `0002_security_hardening.sql` | Grant cleanup, wallet-squatting fix, profile/subscription integrity, risk bounds, policy rewrite |
 | `0003_indexes_updated_at.sql` | FK / hot-query indexes, `updated_at` triggers |
 | `0004_leaderboard_portfolio_revenue.sql` | `strategy_leaderboard()`, `my_portfolio_summary()`, `revenue_daily`, `prune_account_snapshots()` |
+| `0009_market_candles.sql` | Public 1d OHLCV cache and daily Edge Function schedule |
 
 ## Client contract
 - `broker_accounts`: never `select('*')`; list columns explicitly. `agent_secret_enc` is not granted to

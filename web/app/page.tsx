@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Shell, focus, pillDark, pillLine } from "@/components/landing/SiteChrome";
 import StoryLoader from "@/components/landing/StoryLoader";
+import MarketOrbit from "@/components/landing/MarketOrbit";
 
 export const metadata: Metadata = {
   title: "Aether Quant: readable, tested strategies for US stocks and commodities",
@@ -15,12 +16,6 @@ const GATES: [string, string, string][] = [
   ["Drawdown ceiling", "No worse than −35%", "Peak to trough, both periods"],
   ["Evidence", "15+ trades", "No conclusions from a handful"],
   ["Costs", "Fees charged on every fill", "Exchange fee plus ours"],
-];
-
-const MARKETS: [string, [string, string][]][] = [
-  ["US stocks", [["NVIDIA", "NVDA"], ["Tesla", "TSLA"], ["Apple", "AAPL"], ["Microsoft", "MSFT"], ["Amazon", "AMZN"], ["Alphabet", "GOOGL"], ["Meta", "META"]]],
-  ["Index", [["US Tech 100", "XYZ100"]]],
-  ["Commodities", [["Gold", "GOLD"], ["Silver", "SILVER"], ["WTI crude", "CL"], ["Brent crude", "BRENTOIL"], ["Natural gas", "NATGAS"], ["Copper", "COPPER"]]],
 ];
 
 const CUSTODY = [
@@ -121,32 +116,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Markets */}
-      <section id="markets" aria-labelledby="markets-h" className="scroll-mt-16 bg-[#0C1A26] text-white">
-        <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-14 px-4 py-28 sm:px-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <SectionHead dark id="markets-h" kicker="Markets" title={<>US stocks and commodities, <Em>around the clock.</Em></>}>
-            <p>
-              Traded as perpetual contracts on Hyperliquid, settled in USDC, with no market-hours gaps. Coverage grows as
-              new strategies pass our standard.
-            </p>
-          </SectionHead>
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
-            {MARKETS.map(([group, rows]) => (
-              <div key={group}>
-                <h3 className="border-b border-[#24394A] pb-3 text-[13px] font-medium text-[#8FA3B3]">{group}</h3>
-                <ul className="mt-2">
-                  {rows.map(([n, s]) => (
-                    <li key={s} className="flex items-baseline justify-between gap-3 border-b border-[#16293A] py-2.5">
-                      <span className="text-[15.5px]">{n}</span>
-                      <span className="font-[family-name:var(--aq-mono)] text-[12.5px] text-[#7F96A6]">{s}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <MarketOrbit />
 
       {/* Custody */}
       <section id="custody" aria-labelledby="custody-h" className="mx-auto max-w-[1240px] scroll-mt-16 px-4 py-28 sm:px-8">
