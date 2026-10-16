@@ -44,10 +44,16 @@ export async function heartbeat(id: string, detail: unknown) {
 }
 
 /** Run a handler behind the guard; errors become a 500 with the message, never a crash. */
-export function serve(name: string, handler: (req: Request, body: Record<string, unknown>) => Promise<unknown>) {
+export function serve(
+  name: string,
+  handler: (req: Request, body: Record<string, unknown>) => Promise<unknown>,
+  publicAccess = false,
+) {
   Deno.serve(async (req) => {
-    const denied = authorize(req);
-    if (denied) return denied;
+    if (!publicAccess) {
+      const denied = authorize(req);
+      if (denied) return denied;
+    }
     try {
       const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
       return json({ ok: true, ...(await handler(req, body as Record<string, unknown>) as object) });

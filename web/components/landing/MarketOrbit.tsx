@@ -17,7 +17,7 @@ const ASSETS: Asset[] = [
   { name: "Apple", ticker: "AAPL", group: "Equities", logo: "apple.svg", logoSource: "app", color: "#111111" },
   { name: "Microsoft", ticker: "MSFT", group: "Equities", logo: "microsoft.svg", logoSource: "app", color: "#1F2328" },
   { name: "Amazon", ticker: "AMZN", group: "Equities", logo: "AMZN.png", color: "#1F2328" },
-  { name: "Alphabet", ticker: "GOOGL", group: "Equities", logo: "google.svg", logoSource: "app", color: "#4285F4" },
+  { name: "Google Inc", ticker: "GOOGL", group: "Equities", logo: "google.svg", logoSource: "app", color: "#4285F4" },
   { name: "Meta", ticker: "META", group: "Equities", logo: "meta-blue.svg", logoSource: "app", color: "#0467DF" },
   { name: "US Tech 100", ticker: "XYZ100", group: "Index", logo: "XYZ100.png", color: "#4B4FD8" },
   { name: "Gold", ticker: "GOLD", group: "Commodities", logo: "GOLD.png", color: "#B8892B" },

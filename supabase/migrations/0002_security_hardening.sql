@@ -180,10 +180,21 @@ end; $$;
 revoke execute on function public.check_subscription() from public, anon, authenticated;
 
 -- ---------- user_risk bounds ----------
-alter table public.user_risk
-  add constraint user_risk_daily_loss_chk  check (max_daily_loss_pct > 0 and max_daily_loss_pct <= 100),
-  add constraint user_risk_drawdown_chk    check (max_drawdown_pct > 0 and max_drawdown_pct <= 100),
-  add constraint user_risk_gross_lev_chk   check (max_gross_leverage > 0 and max_gross_leverage <= 10);
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conrelid = 'public.user_risk'::regclass and conname = 'user_risk_daily_loss_chk') then
+    alter table public.user_risk add constraint user_risk_daily_loss_chk
+      check (max_daily_loss_pct > 0 and max_daily_loss_pct <= 100);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.user_risk'::regclass and conname = 'user_risk_drawdown_chk') then
+    alter table public.user_risk add constraint user_risk_drawdown_chk
+      check (max_drawdown_pct > 0 and max_drawdown_pct <= 100);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.user_risk'::regclass and conname = 'user_risk_gross_lev_chk') then
+    alter table public.user_risk add constraint user_risk_gross_lev_chk
+      check (max_gross_leverage > 0 and max_gross_leverage <= 10);
+  end if;
+end $$;
 
 -- ---------- exec lock: pin search_path, service role only ----------
 alter function public.try_exec_lock(text, text, int) set search_path = '';
