@@ -1,0 +1,14 @@
+[
+  {
+    "name": "VWAP stretch fade",
+    "description": "Fades moves stretched more than 2 ATR from VWAP back toward it.",
+    "direction": "both",
+    "entry_long": "close < vwap_value - 2 * atr_value",
+    "exit_long": "close > vwap_value",
+    "entry_short": "close > vwap_value + 2 * atr_value",
+    "exit_short": "close < vwap_value",
+    "stop_loss_pct": 3,
+    "take_profit_pct": null,
+    "leverage": 1
+  }
+]

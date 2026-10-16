@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Supertrend follower",
+    "description": "Follows the Supertrend line; works in persistent directional moves, chops in ranges.",
+    "direction": "both",
+    "entry_long": "close crosses above supertrend_value",
+    "exit_long": "close < supertrend_value",
+    "entry_short": "close crosses below supertrend_value",
+    "exit_short": "close > supertrend_value",
+    "stop_loss_pct": 4,
+    "take_profit_pct": null,
+    "leverage": 2
+  },
+  {
+    "name": "MACD momentum, long bias",
+    "description": "Long when MACD crosses its signal above zero; flat when momentum fades.",
+    "direction": "long",
+    "entry_long": "macdext_MACD crosses above macdext_MACDSignal and macdext_MACD > 0",
+    "exit_long": "macdext_MACD < macdext_MACDSignal",
+    "entry_short": null,
+    "exit_short": null,
+    "stop_loss_pct": 3,
+    "take_profit_pct": 8,
+    "leverage": 2
+  }
+]

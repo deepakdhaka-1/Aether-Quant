@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Aroon breakout",
+    "description": "Enters when Aroon flags a fresh high/low regime with expanding bands; breakout style.",
+    "direction": "both",
+    "entry_long": "aroon_AroonUp > 90 and aroon_AroonDown < 30 and bbw_value > bbw_value_prev5",
+    "exit_long": "aroon_AroonUp < 50",
+    "entry_short": "aroon_AroonDown > 90 and aroon_AroonUp < 30 and bbw_value > bbw_value_prev5",
+    "exit_short": "aroon_AroonDown < 50",
+    "stop_loss_pct": 3,
+    "take_profit_pct": null,
+    "leverage": 2
+  }
+]

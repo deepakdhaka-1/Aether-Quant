@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aether Quant · Morphing geometry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F1EC;--ink:#15151B;--mute:#8E8B84;--line:#D9D5CC;--long:#1F45FF;--short:#FF4A1C;--hi:#FFC21A}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Geist,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#scroll{height:420vh}
+#stage{position:fixed;inset:0;overflow:hidden}
+svg#v{position:absolute;inset:0;width:100%;height:100%}
+svg text{font-family:Geist,sans-serif}
+.mono,svg .mono{font-family:'Geist Mono',monospace}
+.brand{position:absolute;left:32px;top:26px;font-weight:700;letter-spacing:-.02em;font-size:17px}
+.brand i{display:inline-block;width:12px;height:12px;background:var(--long);margin-right:8px;border-radius:2px;vertical-align:-1px}
+.step{position:absolute;right:32px;top:28px;font:500 13px 'Geist Mono',monospace;color:var(--mute)}
+.step b{color:var(--ink);font-weight:600}
+.note{position:absolute;right:32px;bottom:22px;font:400 11px 'Geist Mono',monospace;color:var(--mute)}
+.cap{position:absolute;left:50%;bottom:7vh;transform:translateX(-50%);width:min(980px,90vw);text-align:center;font-size:27px;font-weight:600;letter-spacing:-.025em;line-height:1.25}
+.cap span{display:inline-block;transition:opacity .25s,transform .35s cubic-bezier(.2,1.4,.4,1)}
+.bar{position:absolute;left:0;bottom:0;height:3px;background:var(--ink);width:0}
+@media (max-width:900px){
+  .cap{font-size:17px;bottom:auto;top:70vh}
+  .brand{left:16px;font-size:15px}.step{right:16px}.note{right:16px}
+  svg#v{height:66vh;top:10vh}
+}
+</style>
+</head>
+<body>
+<div id="scroll"></div>
+<div id="stage">
+  <svg id="v" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="brand"><i></i>Aether Quant</div>
+  <div class="step" id="step"></div>
+  <div class="cap"><span id="cap"></span></div>
+  <div class="note">Illustrative numbers</div>
+  <div class="bar" id="bar"></div>
+</div>
+<script type="module">
+let A=null;
+try{A=await import('https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm');}catch(e){}
+
+/* ---------- easing (anime.js v4 eases where available) ---------- */
+const E={
+  outExpo:t=>t>=1?1:1-Math.pow(2,-10*t),
+  inOutCubic:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,
+  inCubic:t=>t*t*t,
+  outBack:t=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)},
+  outElastic:t=>t<=0?0:t>=1?1:Math.pow(2,-10*t)*Math.sin((t*10-.75)*(2*Math.PI/3))+1
+};
+if(A&&A.eases){
+  const tryE=(k,f)=>{try{if(typeof f==='function'){const v=f(.5);if(typeof v==='number'&&isFinite(v))E[k]=f;}}catch(e){}};
+  tryE('outExpo',A.eases.outExpo);tryE('inOutCubic',A.eases.inOutCubic);tryE('inCubic',A.eases.inCubic);
+  try{tryE('outElastic',A.eases.outElastic(1,.45));}catch(e){}
+  try{tryE('outBack',A.eases.outBack(1.7));}catch(e){}
+}
+const idle={v:0};
+if(A&&A.animate){try{A.animate(idle,{v:1,duration:2600,loop:true,alternate:true,ease:'inOutSine'});}catch(e){}}
+
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const seg=(s,a,b)=>clamp((s-a)/(b-a));
+const stag=(t,f,sp)=>clamp((t-f*sp)/(1-sp));
+const L=(a,b,t)=>a+(b-a)*t;
+const LP=(P,Q,t)=>P.map((p,i)=>[L(p[0],Q[i][0],t),L(p[1],Q[i][1],t)]);
+const D=pts=>'M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L');
+const fmt=n=>n.toLocaleString('en-US');
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('v');
+function el(tag,at,par=svg){const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);par.appendChild(e);return e}
+const S=(e,at)=>{for(const k in at)e.setAttribute(k,at[k])};
+const C_LONG='#1F45FF',C_SHORT='#FF4A1C',C_INK='#15151B',C_HI='#FFC21A',C_MUTE='#8E8B84';
+
+/* ---------- data: rally then sell-off ---------- */
+const N=48,H=24;
+const C=[],O=[],Hi=[],Lo=[],V=[];
+for(let i=0;i<N;i++){const b=i<=30?140+40*(i/30):180-40*((i-30)/17);C.push(b+3.2*Math.sin(i*1.7)+2.1*Math.sin(i*.63+1));}
+for(let i=0;i<N;i++)O.push(i?C[i-1]:138.6);
+C[H]=O[H]+4.6;O[H+1]=C[H];
+C[N-1]=O[N-1]-3.1;
+for(let i=0;i<N;i++){Hi.push(Math.max(O[i],C[i])+.8+1.6*Math.abs(Math.sin(i*2.3)));Lo.push(Math.min(O[i],C[i])-.8-1.5*Math.abs(Math.cos(i*1.9)));V.push(.35+.45*Math.abs(Math.sin(i*.9))+(i>30?.2:0));}
+const pmin=Math.min(...Lo)-2,pmax=Math.max(...Hi)+2;
+const X=i=>230+i*(1000/(N-1)),Y=p=>620-(p-pmin)/(pmax-pmin)*420;
+const bigY=p=>610-(p-Lo[H])/(Hi[H]-Lo[H])*400;
+
+const small=i=>({x:X(i),w:12,o:Y(O[i]),c:Y(C[i]),h:Y(Hi[i]),l:Y(Lo[i]),vb:735,vh:V[i]*70,ww:2.5});
+const big={x:720,w:150,o:bigY(O[H]),c:bigY(C[H]),h:bigY(Hi[H]),l:bigY(Lo[H]),vb:770,vh:0,ww:7};
+const lerpS=(a,b,t)=>{const r={};for(const k in a)r[k]=L(a[k],b[k],t);return r};
+
+/* ---------- indicators ---------- */
+const ema=(a,n)=>{const k=2/(n+1);let e=a[0];return a.map(v=>e=v*k+e*(1-k))};
+const sma=(a,n)=>a.map((v,i)=>{const s=a.slice(Math.max(0,i-n+1),i+1);return s.reduce((x,y)=>x+y,0)/s.length});
+const sd=(a,n)=>a.map((v,i)=>{const s=a.slice(Math.max(0,i-n+1),i+1),m=s.reduce((x,y)=>x+y,0)/s.length;return Math.sqrt(s.reduce((x,y)=>x+(y-m)**2,0)/s.length)});
+const lines=[];
+[3,5,7,12,15,18,26,30,34,40,60,75,90].forEach(n=>lines.push({a:ema(C,n)}));
+[10,20,30,45].forEach(n=>lines.push({a:sma(C,n)}));
+const m20=sma(C,20),s20=sd(C,20);
+[2,1,-1,-2].forEach(k=>lines.push({a:m20.map((m,i)=>m+k*s20[i])}));
+lines.push({a:ema(Hi,10)},{a:ema(Lo,10)},{a:Hi.map((v,i)=>Math.max(...Hi.slice(Math.max(0,i-19),i+1)))},{a:Lo.map((v,i)=>Math.min(...Lo.slice(Math.max(0,i-19),i+1)))});
+lines.push({a:sma(C,5)},{a:ema(C,100)},{a:ema(C,4)},{a:sma(C,14)},{a:ema(C,45)});
+lines.push({a:ema(C,9),hl:C_INK,lab:'EMA 9'},{a:ema(C,21),hl:C_HI,lab:'EMA 21'},{a:ema(C,50),hl:C_INK,dash:1,lab:'EMA 50'});
+lines.forEach(l=>l.pts=l.a.map((v,i)=>[X(i),Y(v)]));
+const closePts=C.map((v,i)=>[X(i),Y(v)]);
+
+const NAMES=[];
+const fam=[['EMA',[3,5,9,12,21,26,50,100,200]],['SMA',[5,10,20,50,100,200]],['RSI',[2,7,14,21]],['ATR',[7,14,21]],['ADX',[14,28]],['CCI',[14,20]],['MFI',[14]],['ROC',[5,10,20]],['MOM',[10,20]],['WILLR',[14]],['STOCH',[5,14]],['TRIX',[15]],['KAMA',[10,30]],['DPO',[20]],['CMO',[14]],['WMA',[10,20,50]],['HMA',[9,21]],['DEMA',[10,30]],['TEMA',[10,30]],['VWAP',['d','w']],['OBV',['']],['CMF',[20]],['BB up',[20]],['BB lo',[20]],['BB %',[20]],['KC up',[20]],['KC lo',[20]],['DC hi',[20,55]],['DC lo',[20,55]],['MACD',['','sig','hist']],['PPO',[12]],['AROON',[25]],['PSAR',['']],['ULTOSC',['']],['NATR',[14]],['STDEV',[10,20]],['ZSCORE',[20,50]],['SLOPE',[10,20]],['VOL',['ma','z']],['EFI',[13]],['EOM',[14]],['AD',['']],['TSI',[25]],['VORTEX',[14]],['CHOP',[14]],['RVI',[10]],['KST',['']],['FISHER',[9]]];
+fam.forEach(([n,ps])=>ps.forEach(p=>NAMES.push((n+' '+p).trim())));
+while(NAMES.length<128)NAMES.push('FEAT '+NAMES.length);
+NAMES.length=128;
+const HL_NAMES=new Set(['EMA 9','EMA 21','EMA 50','RSI 14','MACD','ATR 14','BB up 20','OBV']);
+
+/* ---------- scene build ---------- */
+const gGrid=el('g',{});
+// faint baseline grid
+for(let k=0;k<6;k++)el('line',{x1:200,x2:1260,y1:200+k*84,y2:200+k*84,stroke:'#E6E2DA','stroke-width':1},gGrid);
+const gChart=el('g',{});
+const cand=[];
+for(let i=0;i<N;i++){
+  const g=el('g',{},gChart);
+  cand.push({g,
+    vol:el('rect',{fill:'#CFCAC0',rx:1.5},g),
+    wu:el('line',{'stroke-linecap':'round'},g),
+    wl:el('line',{'stroke-linecap':'round'},g),
+    body:el('rect',{rx:2},g)});
+}
+// anatomy labels
+const gAn=el('g',{});
+const anat=[
+  ['High','the top price in that hour'],['Close','the last price in that hour'],['Open','the first price in that hour'],['Low','the bottom price in that hour'],
+  ['Body','the move from open to close'],['Wicks','how far price stretched'],['Volume','how much was traded']];
+const anEls=anat.map(([a,b])=>{const g=el('g',{},gAn);const ln=el('line',{stroke:C_INK,'stroke-width':1.5},g);const dt=el('circle',{r:4,fill:C_INK},g);
+  const t=el('text',{'font-size':20,'font-weight':700,fill:C_INK},g);t.textContent=a;const t2=el('text',{'font-size':17,fill:'#55524C'},g);t2.textContent=b;
+  const v=el('text',{'font-size':15,class:'mono',fill:C_MUTE},g);return{g,ln,dt,t,t2,v}});
+// regime brackets
+const gReg=el('g',{});
+const regs=[{a:1,b:30,c:C_LONG,t:'Rally  ·  a chance to go long'},{a:31,b:47,c:C_SHORT,t:'Sell-off  ·  a chance to go short'}].map(r=>{
+  const g=el('g',{},gReg);const p=el('path',{fill:'none',stroke:r.c,'stroke-width':3},g);const t=el('text',{'font-size':17,'font-weight':600,fill:r.c},g);t.textContent=r.t;return{...r,g,p,t}});
+// lines
+const gLines=el('g',{});
+const closeLine=el('path',{fill:'none',stroke:C_INK,'stroke-width':2.5,pathLength:1,'stroke-dasharray':1},gLines);
+lines.forEach(l=>{l.e=el('path',{fill:'none',stroke:l.hl||'#A6A197','stroke-width':l.hl?3.5:1.2,'stroke-dasharray':l.dash?'8 6':'none','stroke-linecap':'round'},gLines);
+  if(l.lab){l.t=el('text',{'font-size':15,'font-weight':700,fill:l.hl===C_HI?'#B88A00':C_INK},gLines);l.t.textContent=l.lab}});
+const indCount=el('text',{x:720,y:170,'text-anchor':'middle','font-size':18,'font-weight':600,fill:C_INK},svg);
+// glyph grid
+const gGly=el('g',{});
+const GC=16,GW=60,GH=42,GX=720-GC*GW/2,GY=200;
+const gly=NAMES.map((n,g)=>{const e=el('g',{},gGly);const r=el('rect',{rx:6},e);const t=el('text',{'font-size':10,'font-weight':600,fill:C_INK,'text-anchor':'middle'},e);t.textContent=n;
+  const v=el('text',{'font-size':10,class:'mono',fill:'#5D5A54','text-anchor':'middle'},e);
+  return{e,r,t,v,hl:HL_NAMES.has(n),cx:GX+(g%GC)*GW+GW/2,cy:GY+Math.floor(g/GC)*GH+GH/2,src:lines[g%lines.length],k:4+Math.floor(g/lines.length)*11,seed:g*1.37}});
+// rule sentences
+const ROWS=[
+  ['EMA 9 crosses above EMA 21','RSI 14 below 70','LONG'],
+  ['Price below EMA 50','MACD falling','SHORT'],
+  ['ATR 14 rising','Close above upper band','LONG'],
+  ['RSI 14 above 75','Volume flow negative','SHORT'],
+  ['EMA 21 crosses below EMA 50','ADX above 20','SHORT'],
+  ['Close above VWAP','Stoch below 80','LONG'],
+  ['MACD crosses up','Price above EMA 50','LONG'],
+  ['Close below lower band','RSI 14 below 30','LONG']];
+const gChips=el('g',{});
+const used=new Set();const pick=s=>{let g=s%128;while(used.has(g))g=(g+1)%128;used.add(g);return g};
+const chips=[];
+ROWS.forEach((row,r)=>{const ws=row.map((t,k)=>k==2?88:t.length*8.6+34);const tot=ws.reduce((a,b)=>a+b,0)+2*14;let x=720-tot/2;const y=228+r*50;
+  row.forEach((t,k)=>{const dir=k==2?(t=='LONG'?C_LONG:C_SHORT):null;const g=el('g',{},gChips);const rc=el('rect',{rx:8},g);const tx=el('text',{'font-size':15,'font-weight':k==2?700:500,'text-anchor':'middle'},g);
+    tx.textContent=k==2?(t=='LONG'?'↑ LONG':'↓ SHORT'):t;
+    chips.push({r,k,g,rc,tx,dir,src:pick(r*37+k*53+11),x,y,w:ws[k],h:38});x+=ws[k]+14;});});
+const counter=el('text',{x:720,y:180,'text-anchor':'middle','font-size':17,class:'mono',fill:C_INK},svg);
+// equity curves
+const gEq=el('g',{});
+const PX0=250,PX1=1030,PY=v=>460-v*5.2;
+const ghosts=[];for(let j=0;j<40;j++){ghosts.push({e:el('path',{fill:'none',stroke:'#BDB8AE','stroke-width':1},gEq),vals:[]});
+  let v=0;for(let i=0;i<N;i++){v+=Math.sin(i*(.7+j*.13)+j)*2.4+(j%3-1.3)*.35;ghosts[j].vals.push(v)}}
+const eq=ROWS.map((row,r)=>{const dir=row[2];const vals=[];let v=0;
+  for(let i=0;i<N;i++){
+    if(r==0)v+=i<=30?1.5+Math.sin(i)*.9:Math.sin(i*1.3)*.7-.15;
+    else if(r==1)v+=i<=30?Math.sin(i*1.1)*.8-.05:2.6+Math.sin(i)*.8;
+    else v+=Math.sin(i*(.5+r*.21)+r)*3.3+(r%2?-.5:.25);
+    vals.push(v)}
+  const p=el('path',{fill:'none',stroke:dir=='LONG'?C_LONG:C_SHORT,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'},gEq);
+  const dot=el('circle',{r:5,fill:dir=='LONG'?C_LONG:C_SHORT},gEq);
+  const lab=el('text',{'font-size':15,'font-weight':700,fill:dir=='LONG'?C_LONG:C_SHORT},gEq);
+  return{vals,p,dot,lab,dir,surv:r<2}});
+const gChk=el('g',{});
+const checks=['Tested on unseen data','Sharpe ratio 0.5 or better','Drawdown no worse than −35%','15 or more trades','Fees included'].map((t,i)=>{const g=el('g',{},gChk);
+  el('rect',{x:0,y:-15,width:22,height:22,rx:5,fill:C_INK},g);const ck=el('path',{d:'M5 -4 L10 1 L17 -9',fill:'none',stroke:'#fff','stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+  const tx=el('text',{x:34,y:2,'font-size':16,'font-weight':500,fill:C_INK},g);tx.textContent=t;return g});
+// order
+const gOrd=el('g',{});
+const stopL=el('line',{stroke:C_SHORT,'stroke-width':2,'stroke-dasharray':'6 6'},gOrd);
+const stopT=el('text',{'font-size':14,'font-weight':600,fill:C_SHORT},gOrd);
+const entL=el('line',{stroke:C_INK,'stroke-width':1.5,'stroke-dasharray':'2 5'},gOrd);
+const arrow=el('path',{fill:'none','stroke-linecap':'round','stroke-linejoin':'round'},svg);
+const ring=el('rect',{fill:'none',stroke:C_INK,'stroke-width':2,rx:6},svg);
+const gTk=el('g',{});
+const tkBox=el('rect',{x:0,y:0,width:310,height:320,rx:14,fill:'#fff',stroke:C_INK,'stroke-width':2},gTk);
+const tkRows=[];
+function tkText(y,txt,at){const t=el('text',{x:24,y,...at},gTk);t.textContent=txt;tkRows.push(t);return t}
+const entry=C[N-1],stop=entry*1.03;
+tkText(38,'ORDER',{'font-size':12,class:'mono',fill:C_MUTE,'letter-spacing':2});
+tkText(78,'↓ SELL · SHORT',{'font-size':30,'font-weight':800,fill:C_SHORT});
+[['Market','NVDA'],['Entry',entry.toFixed(2)],['Stop-loss',stop.toFixed(2)],['Size','2% of account'],['Rule','Price < EMA 50 + MACD ↓']].forEach(([a,b],i)=>{
+  const y=126+i*34;const t=el('text',{x:24,y,'font-size':15,fill:'#6B6862'},gTk);t.textContent=a;const t2=el('text',{x:286,y,'font-size':15,'font-weight':600,'text-anchor':'end',class:i>0&&i<3?'mono':'',fill:C_INK},gTk);t2.textContent=b;tkRows.push(t);tkRows.push(t2)});
+tkText(300,'On your own Hyperliquid account',{'font-size':12,fill:C_MUTE});
+
+/* ---------- arrow geometry ---------- */
+function resample(poly,n){const seglen=[];let tot=0;for(let i=1;i<poly.length;i++){const d=Math.hypot(poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]);seglen.push(d);tot+=d}
+  const out=[];for(let k=0;k<n;k++){let d=tot*k/(n-1),i=0;while(i<seglen.length-1&&d>seglen[i]){d-=seglen[i];i++}const t=seglen[i]?clamp(d/seglen[i]):0;out.push([L(poly[i][0],poly[i+1][0],t),L(poly[i][1],poly[i+1][1],t)])}return out}
+
+/* ---------- captions ---------- */
+const CAPS=[[0,'This is one candle: one hour of NVIDIA’s price.','01 / 07','One candle'],[1,'Each candle holds a few simple facts.','02 / 07','Anatomy'],[2,'Many candles make a chart: a rally, then a sell-off.','03 / 07','Price series'],
+ [3,'128 indicators are calculated on every candle.','04 / 07','Indicators'],[4,'The research engine combines them into rules, long and short.','05 / 07','Research'],
+ [5,'Every rule is backtested. Most fail. Two pass every check.','06 / 07','Backtest'],[6,'On the newest candle the winning rule fires: a short order with a stop-loss.','07 / 07','Live order']];
+const capEl=document.getElementById('cap'),stepEl=document.getElementById('step'),barEl=document.getElementById('bar');let capIdx=-1;
+
+/* ---------- render ---------- */
+function render(s,now){
+  const amb=Math.sin(now/900),idv=idle.v;
+  // --- candle states
+  const split=E.outBack(seg(s,.75,1.15))*(1-E.inOutCubic(seg(s,1.85,2.05)));
+  const anX=E.inOutCubic(seg(s,.75,1.1))*(1-E.inOutCubic(seg(s,1.85,2.05)));
+  const shrink=E.inOutCubic(seg(s,2.0,2.3));
+  const mult=seg(s,2.2,2.85);
+  const cFade=s<3?1:s<6?L(1,.22,seg(s,3.0,3.25))*(1-seg(s,3.55,3.75)):0;
+  const back=seg(s,6.0,6.3), comp=E.inOutCubic(seg(s,6.0,6.35));
+  const cx=x=>230+(x-230)*L(1,.8,comp);
+  for(let i=0;i<N;i++){
+    const c=cand[i];let st,op=1;
+    if(i===H){
+      const b={...big,x:big.x-120*anX,vh:70*Math.max(anX,0)*(1-shrink)};
+      st=s<2?b:lerpS(b,small(H),shrink);
+    } else {
+      const d=Math.abs(i-H)/24,t=stag(mult,d,.55);
+      if(t<=0){c.g.setAttribute('opacity',0);continue}
+      st=lerpS(small(H),small(i),E.outElastic(t));op=Math.min(1,t*4);
+    }
+    if(s>=3)op*=cFade; if(s>=6)op=L(0,i===N-1?1:.45,back);
+    c.g.setAttribute('opacity',op);
+    const up=C[i]>=O[i],col=up?C_LONG:C_SHORT;const x=cx(st.x);
+    const top=Math.min(st.o,st.c),bot=Math.max(st.o,st.c),sp=i===H?split*44:0;
+    S(c.body,{x:x-st.w/2,y:top,width:st.w,height:Math.max(1.5,bot-top),fill:col});
+    S(c.wu,{x1:x,x2:x,y1:st.h-sp,y2:top-sp*.35,stroke:col,'stroke-width':st.ww});
+    S(c.wl,{x1:x,x2:x,y1:bot+sp*.35,y2:st.l+sp,stroke:col,'stroke-width':st.ww});
+    S(c.vol,{x:x-st.w/2,y:st.vb-st.vh+(i===H?sp*.6:0),width:st.w,height:st.vh,fill:i===H&&s<2.2?'#15151B':'#CFCAC0'});
+  }
+  // --- anatomy labels
+  const bx=720-120*anX, sp=split*44;
+  const bodyTop=big.c,bodyBot=big.o;
+  const anchors=[[bx,big.h-sp],[bx+75,bodyTop],[bx+75,bodyBot],[bx,big.l+sp],[bx-75,(bodyTop+bodyBot)/2],[bx-3.5,big.h-sp+30],[bx-75,770-35+sp*.6]];
+  const lpos=[[bx+150,big.h-sp-6],[bx+150,bodyTop-4],[bx+150,bodyBot+14],[bx+150,big.l+sp+4],[bx-300,(bodyTop+bodyBot)/2],[bx-300,big.h-sp+40],[bx-300,760]];
+  const vals=[Hi[H],C[H],O[H],Lo[H]];
+  anEls.forEach((a,k)=>{const t=E.outExpo(stag(seg(s,.95,1.55),k/6,.6))*(1-seg(s,1.8,1.95));a.g.setAttribute('opacity',t);
+    const [ax,ay]=anchors[k],[lx,ly]=lpos[k];const right=lx>ax;const ex=right?lx-14:lx+262;
+    S(a.ln,{x1:ax,y1:ay,x2:L(ax,ex,t),y2:L(ay,ly-6,t)});S(a.dt,{cx:ax,cy:ay});
+    const tx=right?lx:lx;S(a.t,{x:tx+(1-t)*20*(right?1:-1),y:ly});S(a.t2,{x:tx+(1-t)*20*(right?1:-1),y:ly+22});
+    S(a.v,{x:tx+78,y:ly});a.v.textContent=k<4?'$'+vals[k].toFixed(2):'';});
+  // --- regimes
+  const rg=E.outExpo(seg(s,2.7,2.95))*(1-seg(s,3.05,3.25));
+  regs.forEach((r,k)=>{const t=stag(rg,k,.3);r.g.setAttribute('opacity',t);const x0=X(r.a)-6,x1=L(x0,X(r.b)+6,E.outExpo(t));const y=k?Y(Math.max(...Hi.slice(31)))-50:166;
+    S(r.p,{d:`M${x0} ${y+10}V${y}H${x1}V${y+10}`});S(r.t,{x:x0,y:y-12});});
+  // --- lines
+  const lv=s>=2.95&&s<3.85;gLines.setAttribute('opacity',lv?1-seg(s,3.6,3.8):0);
+  if(lv){S(closeLine,{d:D(closePts),'stroke-dashoffset':1-E.inOutCubic(seg(s,2.95,3.15))});
+    const fan=seg(s,3.1,3.5);
+    lines.forEach((l,j)=>{const t=E.outExpo(stag(fan,j/(lines.length-1),.55));const p=LP(closePts,l.pts,t).map((q,i)=>[q[0],q[1]+(l.hl?0:Math.sin(now/700+j+i*.3)*.8)]);
+      S(l.e,{d:D(p),opacity:t>0?(l.hl?1:.85):0});if(l.t){const q=p[N-1];S(l.t,{x:q[0]+10,y:q[1]+(l.lab=='EMA 9'?-8:l.lab=='EMA 50'?16:5),opacity:t})}});}
+  const ic=seg(s,3.1,3.45)*(1-seg(s,3.95,4.05));
+  S(indCount,{opacity:ic});indCount.textContent=fmt(Math.round(128*E.outExpo(seg(s,3.1,3.5))))+' indicators · updating every candle';
+  // --- glyphs
+  const gf=seg(s,3.5,3.95),gOut=seg(s,4.0,4.3);
+  const gVis=s>=3.5&&s<5.0;gGly.setAttribute('opacity',gVis?1:0);
+  if(gVis){gly.forEach((g,i)=>{const t=E.outBack(stag(gf,i/127,.6));if(t<=0){g.e.setAttribute('opacity',0);return}
+    const q=g.src.pts[g.k];
+    let cx2=L(q[0],g.cx,t),cy2=L(q[1],g.cy,t),w=L(6,GW-8,clamp(t)),h=L(6,GH-8,clamp(t));
+    const chipTaken=used.has(i);const out=chipTaken?0:E.inCubic(stag(gOut,i/127,.5));
+    if(chipTaken&&s>=4.05){g.e.setAttribute('opacity',0);return}
+    w=L(w,5,out);h=L(h,5,out);cy2+=out*30;
+    cy2+=Math.sin(now/600+g.seed)*1.2*t*(1-out);
+    g.e.setAttribute('opacity',1-out);
+    const hl=g.hl&&s>3.85;
+    S(g.r,{x:cx2-w/2,y:cy2-h/2,width:w,height:h,fill:hl?C_HI:'#fff',stroke:C_INK,'stroke-width':hl?0:1.2});
+    const to=seg(t,.6,1)*(1-out*3);S(g.t,{x:cx2,y:cy2-2,opacity:to});S(g.v,{x:cx2,y:cy2+11,opacity:to});
+    const val=50+40*Math.sin(g.seed*3+Math.floor(now/450)*.37);g.v.textContent=val.toFixed(1);});}
+  // --- chips
+  const chipIn=seg(s,4.05,4.55),coll=seg(s,5.0,5.25);
+  const chVis=s>=4.05&&s<5.3;gChips.setAttribute('opacity',chVis?1:0);
+  if(chVis){chips.forEach((c,j)=>{const g=gly[c.src];const t=E.outElastic(stag(chipIn,j/23,.6));
+    const rt=E.inCubic(stag(coll,c.r/7,.4));
+    let x=L(g.cx-(GW-8)/2,c.x,t),y=L(g.cy-(GH-8)/2,c.y,t),w=L(GW-8,c.w,t),h=L(GH-8,c.h,t);
+    y+=h/2*rt;h*=(1-rt);
+    S(c.rc,{x,y,width:w,height:Math.max(0,h),fill:c.dir&&t>.5?c.dir:(t>.5?'#fff':C_HI),stroke:c.dir?'none':C_INK,'stroke-width':1.5});
+    S(c.tx,{x:x+w/2,y:y+h/2+5,opacity:seg(t,.5,1)*(1-rt*2),fill:c.dir?'#fff':C_INK});});}
+  const ct=seg(s,4.3,4.95),rj=seg(s,5.55,5.9);
+  S(counter,{opacity:seg(s,4.25,4.4)*(1-seg(s,6.0,6.15))});
+  counter.textContent=(ct<1?'testing ':'')+fmt(Math.round(1240*E.inOutCubic(ct)))+' combinations'+(rj>0?' · '+fmt(Math.round(1238*E.outExpo(rj)))+' rejected':(ct<1?'…':''));
+  // --- equity
+  const eVis=s>=5.0&&s<6.6;gEq.setAttribute('opacity',eVis?1:0);
+  const morph=seg(s,5.1,5.4),race=E.inOutCubic(seg(s,5.3,5.75)),fail=seg(s,5.6,5.9);
+  const head=race*(N-1);
+  const flatRow=r=>{const cs=chips.filter(c=>c.r===r);const x0=cs[0].x,x1=cs[2].x+cs[2].w;return Array.from({length:N},(_,i)=>[L(x0,x1,i/(N-1)),cs[0].y+19])};
+  const curve=vals=>vals.map((v,i)=>[L(PX0,PX1,i/(N-1)),PY(i<=head?v:(vals[Math.floor(head)]||0))]);
+  const winT=E.outElastic(seg(s,6.05,6.5));
+  const tip=[cx(X(N-1)),Y(Hi[N-1])-16],tail=[tip[0],tip[1]-190];
+  const arrowPts=resample([tail,tip,[tip[0]-26,tip[1]-30],tip,[tip[0]+26,tip[1]-30]],N);
+  if(eVis){
+    ghosts.forEach((g,j)=>{const t=seg(s,5.2,5.35);const f=E.inCubic(stag(fail,j/39,.4));S(g.e,{d:D(curve(g.vals)),opacity:t*(1-f)*.7,transform:`translate(0 ${f*140})`})});
+    eq.forEach((q,r)=>{const t=E.outExpo(stag(morph,r/7,.4));let pts=LP(flatRow(r),curve(q.vals),t);
+      let f=q.surv?0:E.inCubic(stag(fail,r/7,.4));
+      let op=(s<5.15?seg(s,5.0,5.15):1)*(1-f);
+      if(s>=6){op=r===1?1:(1-seg(s,6.0,6.15))*(q.surv?1:0)}
+      if(r===1&&s>=6.05)pts=LP(pts,arrowPts,winT);
+      S(q.p,{d:D(pts),opacity:op,transform:`translate(0 ${f*160})`,'stroke-width':r===1&&s>=6.05?L(q.surv&&fail>.9?4:2.5,9,clamp(winT)):(q.surv&&fail>.9?4:2.5),stroke:r===1&&s>=6.05?C_SHORT:(q.dir=='LONG'?C_LONG:C_SHORT)});
+      const hp=pts[Math.min(N-1,Math.round(head))];S(q.dot,{cx:hp[0],cy:hp[1],opacity:s<6.05?op*seg(s,5.3,5.35):0,transform:`translate(0 ${f*160})`});
+      const ret=q.vals[N-1];S(q.lab,{x:PX1+14,y:PY(ret)+5,opacity:q.surv?seg(s,5.85,6.0)*(1-seg(s,6.0,6.1)):0});q.lab.textContent=(q.dir=='LONG'?'Long rule ':'Short rule ')+'+'+Math.round(ret)+'%';});
+  }
+  arrow.setAttribute('opacity',s>=6.6?1:0);
+  if(s>=6.6){const by=Math.sin(now/500)*4;S(arrow,{d:D(arrowPts.map(p=>[p[0],p[1]+by])),stroke:C_SHORT,'stroke-width':9})}
+  gChk.setAttribute('opacity',s>=5.5&&s<6.2?1:0);
+  checks.forEach((g,i)=>{const t=E.outBack(stag(seg(s,5.55,5.9),i/4,.5))*(1-seg(s,6.0,6.15));S(g,{transform:`translate(${1110+(1-t)*40} ${240+i*44})`,opacity:clamp(t)})});
+  // --- order
+  const oT=seg(s,6.35,6.6);gOrd.setAttribute('opacity',oT);
+  const xe=cx(X(N-1));
+  S(stopL,{x1:L(xe,cx(230),E.outExpo(oT)),x2:xe+30,y1:Y(stop),y2:Y(stop)});S(stopT,{x:cx(230),y:Y(stop)-8});stopT.textContent='Stop-loss '+stop.toFixed(2);
+  S(entL,{x1:cx(230),x2:xe+30,y1:Y(entry),y2:Y(entry)});
+  S(ring,{x:xe-14,y:Y(Hi[N-1])-8,width:28,height:Y(Lo[N-1])-Y(Hi[N-1])+16,opacity:seg(s,6.3,6.45)});
+  const tk=E.outBack(seg(s,6.45,6.75));gTk.setAttribute('opacity',clamp(tk*2));gTk.setAttribute('transform',`translate(${1090+(1-tk)*80} 230)`);
+  tkRows.forEach((t,i)=>t.setAttribute('opacity',stag(seg(s,6.5,6.85),i/(tkRows.length-1),.6)));
+  // --- caption/step
+  let ci=Math.min(6,Math.max(0,Math.floor(s+.02)));
+  if(ci!==capIdx){capIdx=ci;capEl.style.opacity=0;capEl.style.transform='translateY(10px)';
+    requestAnimationFrame(()=>{capEl.textContent=CAPS[ci][1];capEl.style.opacity=1;capEl.style.transform='none'});
+    stepEl.innerHTML=`<b>${CAPS[ci][2]}</b>&nbsp;&nbsp;${CAPS[ci][3]}`;}
+  barEl.style.width=(s/7*100)+'%';
+}
+
+/* ---------- scroll + lerp ---------- */
+const qp=new URLSearchParams(location.search).get('p');
+let lock=qp!==null,target=qp!==null?clamp(parseFloat(qp)||0):0,cur=target;
+const maxS=()=>document.documentElement.scrollHeight-innerHeight;
+if(lock){requestAnimationFrame(()=>scrollTo(0,target*maxS()))}
+['wheel','touchstart','keydown'].forEach(ev=>addEventListener(ev,()=>{lock=false},{passive:true}));
+addEventListener('scroll',()=>{if(!lock)target=clamp(scrollY/maxS())},{passive:true});
+function loop(now){cur+=(target-cur)*.12;if(Math.abs(target-cur)<1e-4)cur=target;render(cur*7,now);requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

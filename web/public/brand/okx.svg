@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="OKX logo">
+  <rect width="256" height="256" fill="#9BF227"/>
+  <rect x="80" y="80" width="44" height="44" rx="4" fill="#050505"/>
+  <rect x="132" y="80" width="44" height="44" rx="4" fill="#050505"/>
+  <rect x="106" y="106" width="44" height="44" rx="4" fill="#050505"/>
+  <rect x="80" y="132" width="44" height="44" rx="4" fill="#050505"/>
+  <rect x="132" y="132" width="44" height="44" rx="4" fill="#050505"/>
+</svg>

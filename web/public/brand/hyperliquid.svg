@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="HyperLiquid logo">
+  <rect width="400" height="400" fill="#062e2a"/>
+  <rect x="8" y="8" width="384" height="384" fill="none" stroke="#0e4b45" stroke-width="8"/>
+  <path d="M100 120 C70 120 58 166 58 200 C58 234 70 280 100 280 C132 280 148 236 170 216 C182 206 218 206 230 216 C252 236 268 280 300 280 C330 280 342 234 342 200 C342 166 330 120 300 120 C268 120 252 164 230 184 C218 194 182 194 170 184 C148 164 132 120 100 120 Z" fill="#89e2d0"/>
+</svg>

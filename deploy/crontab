@@ -1,0 +1,7 @@
+# Aether engine schedule (UTC). Used by deploy/scheduler.py in docker-compose.
+# `timeout` keeps each pass bounded; executor 100s < 110s exec_lock TTL.
+* * * * *          timeout 100 python -m aether.cli execute
+1,16,31,46 * * * * timeout 600 python -m aether.cli signals
+*/5 * * * *        timeout 120 python scripts/monitor_run.py
+7 * * * *          timeout 600 python -m aether.cli fees
+17 3 * * *          timeout 600 python scripts/monitor_prune.py

@@ -1,0 +1,10 @@
+# BuildKit picks this up automatically for deploy/engine.Dockerfile (Dockerfile-specific ignore).
+# Keeps local secrets and venvs out of the build context.
+.env
+.env.*
+!.env*.example
+.venv
+__pycache__
+*.pyc
+tests
+.pytest_cache

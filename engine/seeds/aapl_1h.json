@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Bollinger band snap-back",
+    "description": "Buys a close back inside the lower band and sells at the middle band; for range-bound sessions.",
+    "direction": "long",
+    "entry_long": "close_prev < bbands_LowerBand_prev and close > bbands_LowerBand",
+    "exit_long": "close > bbands_MiddleBand",
+    "entry_short": null,
+    "exit_short": null,
+    "stop_loss_pct": 3,
+    "take_profit_pct": 5,
+    "leverage": 1
+  },
+  {
+    "name": "Stochastic pullback in uptrend",
+    "description": "Buys oversold stochastic dips while the trend (DI+ > DI-) is up.",
+    "direction": "long",
+    "entry_long": "stoch_K crosses above stoch_D and stoch_K < 25 and dmi_plusdi > dmi_minusdi",
+    "exit_long": "stoch_K > 80",
+    "entry_short": null,
+    "exit_short": null,
+    "stop_loss_pct": 2.5,
+    "take_profit_pct": 5,
+    "leverage": 2
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Supertrend follower",
+    "description": "Follows the Supertrend line; works in persistent directional moves, chops in ranges.",
+    "direction": "both",
+    "entry_long": "close crosses above supertrend_value",
+    "exit_long": "close < supertrend_value",
+    "entry_short": "close crosses below supertrend_value",
+    "exit_short": "close > supertrend_value",
+    "stop_loss_pct": 4,
+    "take_profit_pct": null,
+    "leverage": 2
+  },
+  {
+    "name": "Stochastic pullback in uptrend",
+    "description": "Buys oversold stochastic dips while the trend (DI+ > DI-) is up.",
+    "direction": "long",
+    "entry_long": "stoch_K crosses above stoch_D and stoch_K < 25 and dmi_plusdi > dmi_minusdi",
+    "exit_long": "stoch_K > 80",
+    "entry_short": null,
+    "exit_short": null,
+    "stop_loss_pct": 2.5,
+    "take_profit_pct": 5,
+    "leverage": 2
+  }
+]

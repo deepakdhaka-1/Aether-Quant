@@ -1,0 +1,14 @@
+numpy>=1.26
+pandas>=2.2
+requests>=2.31
+supabase>=2.4
+cryptography>=42
+eth-account>=0.11
+hyperliquid-python-sdk>=0.9
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+python-dotenv>=1.0
+pytest>=8
+pandas-ta-classic==0.6.52   # primary indicator engine (aether/ta/engine.py)
+tzdata>=2024.1              # America/New_York on Windows hosts

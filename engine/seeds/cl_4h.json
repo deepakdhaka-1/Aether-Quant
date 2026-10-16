@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Volatility squeeze breakout",
+    "description": "After a Bollinger squeeze, trades the break of the upper or lower band.",
+    "direction": "both",
+    "entry_long": "bbw_value_prev < bbw_value_prev20 * 0.8 and close crosses above bbands_UpperBand",
+    "exit_long": "close < bbands_MiddleBand",
+    "entry_short": "bbw_value_prev < bbw_value_prev20 * 0.8 and close crosses below bbands_LowerBand",
+    "exit_short": "close > bbands_MiddleBand",
+    "stop_loss_pct": 2.5,
+    "take_profit_pct": 6,
+    "leverage": 2
+  },
+  {
+    "name": "Money-flow confirmation",
+    "description": "Trend entries only when Chaikin money flow and MFI confirm buying or selling pressure.",
+    "direction": "both",
+    "entry_long": "cmf_value > 0.1 and mfi_value > 55 and close > ema_value",
+    "exit_long": "cmf_value < 0",
+    "entry_short": "cmf_value < -0.1 and mfi_value < 45 and close < ema_value",
+    "exit_short": "cmf_value > 0",
+    "stop_loss_pct": 3,
+    "take_profit_pct": null,
+    "leverage": 1
+  }
+]

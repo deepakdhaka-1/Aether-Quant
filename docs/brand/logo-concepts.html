@@ -1,0 +1,63 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F5F7F7;font-family:Inter,sans-serif;color:#0C1A26}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding:40px}
+  .card{background:#fff;border:1px solid #DDE3E6;border-radius:10px;padding:28px}
+  .big{display:flex;justify-content:center;padding:18px 0 26px}
+  .lock{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid #EEF2F3}
+  .word{font-family:Newsreader,serif;font-weight:500;font-size:26px;letter-spacing:-.01em}
+  .dark{background:#0C1A26;border-radius:8px;padding:14px 16px;margin-top:10px;display:flex;align-items:center;gap:12px;color:#fff}
+  .sizes{display:flex;align-items:end;gap:18px;margin-top:16px}
+  h3{margin:0 0 4px;font-size:15px} p{margin:0;color:#5A6874;font-size:13.5px;line-height:1.5}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+  <!-- A: AE ligature. One shared stem: the A's right leg is the E's spine. -->
+  <symbol id="m1" viewBox="0 0 48 48">
+    <path d="M6 41 L20 7 H42" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linejoin="miter" stroke-linecap="butt"/>
+    <path d="M20 7 V41 H42" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linejoin="miter"/>
+    <path d="M12.2 27 H38" fill="none" stroke="var(--accent,#1E6B62)" stroke-width="4.2"/>
+  </symbol>
+  <!-- B: The crossing. A rising path crosses a threshold line; the dot marks the entry. -->
+  <symbol id="m2" viewBox="0 0 48 48">
+    <rect x="3" y="3" width="42" height="42" rx="9" fill="none" stroke="currentColor" stroke-width="3"/>
+    <path d="M9 26 H39" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3" opacity=".55"/>
+    <path d="M10 35 L19 29 L25 31 L38 13" fill="none" stroke="var(--accent,#1E6B62)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="28.4" cy="26" r="3.6" fill="currentColor"/>
+  </symbol>
+  <!-- C: Strata. Three layers rising into an A: the upper air, built from discrete rules. -->
+  <symbol id="m3" viewBox="0 0 48 48">
+    <path d="M24 5 L31 18 H17 Z" fill="var(--accent,#1E6B62)"/>
+    <path d="M14.5 23 H33.5 L38 31 H10 Z" fill="currentColor"/>
+    <path d="M7.5 36 H40.5 L44 42.5 H4 Z" fill="currentColor"/>
+  </symbol>
+</svg>
+
+<div class="row">
+  <div class="card">
+    <h3>A · The Æ ligature</h3>
+    <p>"Æther" is the original spelling. The A's right leg doubles as the E's spine, and the crossbar runs through both letters in the accent colour. It reads as a monogram and doesn't depend on finance imagery.</p>
+    <div class="big"><svg width="150" height="150" style="color:#0C1A26"><use href="#m1"/></svg></div>
+    <div class="lock"><svg width="34" height="34" style="color:#0C1A26"><use href="#m1"/></svg><span class="word">Aether Quant</span></div>
+    <div class="dark"><svg width="30" height="30" style="color:#fff;--accent:#6CC3AC"><use href="#m1"/></svg><span class="word" style="font-size:22px">Aether Quant</span></div>
+    <div class="sizes"><svg width="48" height="48"><use href="#m1"/></svg><svg width="32" height="32"><use href="#m1"/></svg><svg width="16" height="16"><use href="#m1"/></svg></div>
+  </div>
+  <div class="card">
+    <h3>B · The crossing</h3>
+    <p>The moment a rule fires: price crosses a threshold and the dot marks the entry. It's literally what the product does, but it's closer to generic chart icons.</p>
+    <div class="big"><svg width="150" height="150" style="color:#0C1A26"><use href="#m2"/></svg></div>
+    <div class="lock"><svg width="34" height="34" style="color:#0C1A26"><use href="#m2"/></svg><span class="word">Aether Quant</span></div>
+    <div class="dark"><svg width="30" height="30" style="color:#fff;--accent:#6CC3AC"><use href="#m2"/></svg><span class="word" style="font-size:22px">Aether Quant</span></div>
+    <div class="sizes"><svg width="48" height="48"><use href="#m2"/></svg><svg width="32" height="32"><use href="#m2"/></svg><svg width="16" height="16"><use href="#m2"/></svg></div>
+  </div>
+  <div class="card">
+    <h3>C · Strata</h3>
+    <p>Three stacked layers that rise into an A: the upper air ("aether") built from discrete, disciplined steps. A solid shape, so it holds up best at favicon size.</p>
+    <div class="big"><svg width="150" height="150" style="color:#0C1A26"><use href="#m3"/></svg></div>
+    <div class="lock"><svg width="34" height="34" style="color:#0C1A26"><use href="#m3"/></svg><span class="word">Aether Quant</span></div>
+    <div class="dark"><svg width="30" height="30" style="color:#fff;--accent:#6CC3AC"><use href="#m3"/></svg><span class="word" style="font-size:22px">Aether Quant</span></div>
+    <div class="sizes"><svg width="48" height="48"><use href="#m3"/></svg><svg width="32" height="32"><use href="#m3"/></svg><svg width="16" height="16"><use href="#m3"/></svg></div>
+  </div>
+</div>
+</body></html>

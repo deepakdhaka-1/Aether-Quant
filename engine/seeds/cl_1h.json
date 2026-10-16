@@ -1,0 +1,14 @@
+[
+  {
+    "name": "RSI mean reversion in chop",
+    "description": "Fades RSI extremes when the market is choppy (CHOP high, ADX low).",
+    "direction": "both",
+    "entry_long": "rsi_value crosses above 30 and chop_value > 50",
+    "exit_long": "rsi_value > 55",
+    "entry_short": "rsi_value crosses below 70 and chop_value > 50",
+    "exit_short": "rsi_value < 45",
+    "stop_loss_pct": 2.5,
+    "take_profit_pct": 4,
+    "leverage": 1
+  }
+]

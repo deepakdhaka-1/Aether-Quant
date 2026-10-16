@@ -1,0 +1,38 @@
+# Single-VM deploy: engine API + a cron sidecar that runs the executor / signals / monitor / fees passes.
+#
+#   cp engine/.env.example deploy/.env      # fill in; append engine/.env.monitor.example values
+#   chmod 600 deploy/.env
+#   docker compose -f deploy/docker-compose.yml up -d --build
+#
+# Secrets come from deploy/.env at RUNTIME (env_file), never baked into the image.
+# The API binds to 127.0.0.1 only: put Caddy/nginx with TLS in front, or reach it over a
+# private network / SSH tunnel. NEVER publish an admin or API port on 0.0.0.0 (n8n incident).
+name: aether
+
+x-engine: &engine
+  build:
+    context: ../engine
+    dockerfile: ../deploy/engine.Dockerfile
+  image: aether-engine:local
+  env_file: .env
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  security_opt: ["no-new-privileges:true"]
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+services:
+  api:
+    <<: *engine
+    command: ["uvicorn", "aether.api:app", "--host", "0.0.0.0", "--port", "8080"]
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  cron:
+    <<: *engine
+    command: ["python", "-u", "/deploy/scheduler.py", "/deploy/crontab"]
+    volumes:
+      - ./scheduler.py:/deploy/scheduler.py:ro
+      - ./crontab:/deploy/crontab:ro
