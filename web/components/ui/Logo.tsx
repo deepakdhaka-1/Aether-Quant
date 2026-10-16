@@ -2,9 +2,11 @@ import Link from "next/link";
 
 export function LogoMark({ size = 26 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
-      <path d="M16 2 30 29H2Z" fill="none" stroke="#2fbf9b" strokeWidth="2.2" strokeLinejoin="round" />
-      <path d="M7 22c4-1 6-8 9-8s4 5 9 4" fill="none" stroke="#7cf5d4" strokeWidth="2" strokeLinecap="round" />
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden>
+      <path d="M9 35 24 8l15 27" fill="none" stroke="#1E6B62" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 27h16" fill="none" stroke="#1E6B62" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M5 35c9-1 12-14 21-14 6 0 9 5 17 4" fill="none" stroke="#7CF5D4" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="43" cy="25" r="2.3" fill="#1E6B62" />
     </svg>
   );
 }

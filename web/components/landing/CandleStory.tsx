@@ -4,8 +4,8 @@
 // a candle breaks apart -> reassembles and clones into a series -> computations grow from the series ->
 // EMA lines draw over it -> rule fragments peel off into candidate logic -> most fail -> the survivor is
 // published and signals on the same chart -> the last signal travels to an order on the user's account.
-// Desktop (motion allowed): pinned stage, anime.js timeline synced to scroll (reversible).
-// Mobile / reduced motion: the same stage frozen at each step, stacked with plain-text detail.
+// Desktop: pinned stage, anime.js timeline synced to scroll (reversible).
+// Mobile: the same stage frozen at each step, stacked with plain-text detail.
 
 import { useEffect, useRef, useState } from "react";
 import { createTimeline, onScroll } from "animejs";
@@ -207,8 +207,8 @@ const STEPS: Step[] = [
 
 /* ---------------- the stage: one SVG, 1000 x 640 ---------------- */
 
-const INK = "#EAF0FF", GREEN = "#2EE6A6", RED = "#FF5C7A", AMBER = "#FFC145", MUTE = "#93A0C4", LINE = "#2B3B6B", DEEP = "#070B1C", PANEL = "#111A3A";
-const EMA_C = { 5: AMBER, 13: "#38D6F5", 34: "#C084FC" } as const;
+const INK = "#0C1A26", GREEN = "#1E6B62", RED = "#C74747", AMBER = "#A8791A", MUTE = "#5A6874", LINE = "#DDE5E7", DEEP = "#0C1A26", PANEL = "#FFFFFF";
+const EMA_C = { 5: AMBER, 13: "#087C98", 34: "#7051A0" } as const;
 const DIRC = { long: GREEN, short: RED } as const;
 
 function Candle({ b, i }: { b: Bar; i: number }) {
@@ -254,7 +254,7 @@ function Stage({ id }: { id: string }) {
           <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
         <pattern id="aqdots" width="24" height="24" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="1" fill="#26346A" />
+          <circle cx="1" cy="1" r="1" fill="#DCE4E6" />
         </pattern>
       </defs>
       <rect className="aq-drift" x="-48" y="-48" width="1096" height="736" fill="url(#aqdots)" />
@@ -266,8 +266,8 @@ function Stage({ id }: { id: string }) {
             const v = PLO + ((PHI - PLO) * k) / 4;
             return (
               <g key={k}>
-                <line x1="120" x2="880" y1={Y(v)} y2={Y(v)} stroke="#1A2550" />
-                <text x="886" y={Y(v) + 4} fontSize="11" fill="#5D7486" fontFamily="var(--aq-mono)">{v.toFixed(0)}</text>
+                <line x1="120" x2="880" y1={Y(v)} y2={Y(v)} stroke="#E5EAEC" />
+                <text x="886" y={Y(v) + 4} fontSize="11" fill={MUTE} fontFamily="var(--aq-mono)">{v.toFixed(0)}</text>
               </g>
             );
           })}
@@ -295,7 +295,7 @@ function Stage({ id }: { id: string }) {
         ))}
         <g data-a={q("amb")} style={{ opacity: 0 }}>
           {([[5, E9], [13, E20], [34, E50]] as const).map(([n, arr]) => (
-            <path key={n} className="aq-flow" d={linePath(arr)} fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="1.4" strokeDasharray="2 26" />
+            <path key={n} className="aq-flow" d={linePath(arr)} fill="none" stroke={INK} strokeOpacity="0.35" strokeWidth="1.4" strokeDasharray="2 26" />
           ))}
         </g>
         <g data-a={q("cursor")} style={{ opacity: 0 }}>
@@ -328,7 +328,7 @@ function Stage({ id }: { id: string }) {
           <rect x="465" y={BIG.top} width="70" height="200" rx="3" fill={GREEN} filter="url(#aqglow)" />
           <g data-a={q("ot")}><line x1="422" x2="465" y1={BIG.bot} y2={BIG.bot} stroke={INK} strokeWidth="3" strokeLinecap="round" /></g>
           <g data-a={q("ct")}><line x1="535" x2="578" y1={BIG.top} y2={BIG.top} stroke={INK} strokeWidth="3" strokeLinecap="round" /></g>
-          <g data-a={q("vol")} style={{ opacity: 0 }}><rect x="472" y="552" width="56" height="44" rx="2" fill="#2C7A86" /></g>
+          <g data-a={q("vol")} style={{ opacity: 0 }}><rect x="472" y="552" width="56" height="44" rx="2" fill="#7FAEAA" /></g>
         </g>
       </g>
 
@@ -344,13 +344,13 @@ function Stage({ id }: { id: string }) {
 
       {/* ---------- published card (behind the survivor row once it moves) ---------- */}
       <g data-a={q("card")} style={{ opacity: 0, transformOrigin: "760px 230px", transformBox: "view-box" }}>
-        <rect x="540" y="96" width="445" height="300" rx="20" fill="#121C48" stroke={AMBER} strokeOpacity="0.6" filter="url(#aqglowsoft)" />
+        <rect x="540" y="96" width="445" height="300" rx="20" fill={PANEL} stroke={LINE} filter="url(#aqglowsoft)" />
         <circle className="aq-pulse" cx="566" cy="124" r="3.5" fill={AMBER} />
-        <text x="578" y="128" fontSize="11.5" fill="#8FA3B3" letterSpacing="1">PUBLISHED · NVDA · 1H CANDLES</text>
+        <text x="578" y="128" fontSize="11.5" fill={MUTE} letterSpacing="1">PUBLISHED · NVDA · 1H CANDLES</text>
         {RULE_LINES.map((l, i) => (
-          <text key={i} x="562" y={160 + i * 26} fontSize="19" fill="#fff" fontFamily="var(--aq-serif)">{l}</text>
+          <text key={i} x="562" y={160 + i * 26} fontSize="19" fill={INK} fontFamily="var(--aq-serif)">{l}</text>
         ))}
-        <text x="562" y="373" fontSize="11.5" fill="#8FA3B3" letterSpacing="1">TRADES</text>
+        <text x="562" y="373" fontSize="11.5" fill={MUTE} letterSpacing="1">TRADES</text>
         {TRADES.map((t, k) => (
           <g key={k} data-a={q("sgc")} style={{ opacity: 0 }}>
             <rect x={626 + k * 118} y="356" width="110" height="24" rx="12" fill={DIRC[t.dir]} />
@@ -395,18 +395,18 @@ function Stage({ id }: { id: string }) {
             const [sx, sy] = SRC[c.s];
             return (
               <g key={k} data-a={q("chip")} data-dx={sx - (x + w / 2)} data-dy={sy - (y + CHIP_H / 2)} style={{ opacity: 0 }}>
-                <rect x={x} y={y} width={w} height={CHIP_H} rx="13" fill="rgba(255,193,69,.10)" stroke={AMBER} filter="url(#aqglowsoft)" />
-                <text x={x + w / 2} y={y + 17} fontSize="11" textAnchor="middle" fill="#FFE2A3" fontFamily="var(--aq-mono)">{c.t}</text>
+                <rect x={x} y={y} width={w} height={CHIP_H} rx="13" fill="rgba(168,121,26,.10)" stroke={AMBER} filter="url(#aqglowsoft)" />
+                <text x={x + w / 2} y={y + 17} fontSize="11" textAnchor="middle" fill="#79550F" fontFamily="var(--aq-mono)">{c.t}</text>
               </g>
             );
           })}
           <g transform={`translate(0 ${ROW_Y(r) + 2})`}>
             <path data-a={q(r >= KEEP ? "spx" : "sp0")} d={spark(200 + r, r >= KEEP ? (r % 2 ? -0.35 : 0.02) : 0.5)} pathLength={1} fill="none"
-              stroke={r >= KEEP ? "#4A5878" : DIRC[r ? "short" : "long"]} strokeWidth="1.6" strokeDasharray="1" strokeDashoffset="1" />
+              stroke={r >= KEEP ? "#A8B4B8" : DIRC[r ? "short" : "long"]} strokeWidth="1.6" strokeDasharray="1" strokeDashoffset="1" />
             {r >= KEEP && (
               <g data-a={q("fail")} style={{ opacity: 0 }}>
-                <rect x="931" y="-2" width="48" height="18" rx="9" fill="rgba(255,107,107,.16)" />
-                <text x="955" y="11" fontSize="10.5" textAnchor="middle" fill="#FF8A8A" fontWeight="700">failed</text>
+                <rect x="931" y="-2" width="48" height="18" rx="9" fill="rgba(199,71,71,.10)" />
+                <text x="955" y="11" fontSize="10.5" textAnchor="middle" fill="#A93232" fontWeight="700">failed</text>
               </g>
             )}
           </g>
@@ -445,7 +445,7 @@ function Stage({ id }: { id: string }) {
         ] as const
       ).map(([t, d1, d2, x, y, w, h], i) => (
         <g key={t} data-a={q("node")} style={{ opacity: 0 }}>
-          <rect x={x} y={y} width={w} height={h} rx="16" fill="none" stroke="#4C6A80" strokeWidth="1.5" strokeDasharray="5 4" />
+          <rect x={x} y={y} width={w} height={h} rx="16" fill="none" stroke="#9BAAB0" strokeWidth="1.5" strokeDasharray="5 4" />
           <rect data-a={q("fill")} style={{ opacity: 0 }} x={x} y={y} width={w} height={h} rx="16"
             fill={i === 2 ? GREEN : PANEL} stroke={i === 2 ? GREEN : LINE} filter={i === 2 ? "url(#aqglow)" : undefined} />
           {i === 3 && <image href="/brand/Hyperliquid_Blob_Light.svg" x={x + 16} y={y + 16} width="22" height="22" />}
@@ -640,17 +640,16 @@ function Pinned() {
   const active = Math.min(n - 1, Math.floor(p * n));
   const cur = STEPS[active];
   return (
-    <section ref={section} aria-label="How a strategy is made, step by step" className="relative bg-[radial-gradient(ellipse_at_50%_30%,#1C2A66_0%,#0D1538_45%,#060A1C_100%)]" style={{ height: `${n * 72 + 100}vh` }}>
+    <section ref={section} aria-label="How a strategy is made, step by step" className="relative bg-[#F5F7F7]" style={{ height: `${n * 72 + 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(255,92,122,0.10),transparent_45%),radial-gradient(ellipse_at_80%_20%,rgba(46,230,166,0.10),transparent_45%)]" />
         {/* minimal rail */}
         <ol className="absolute inset-x-0 top-16 z-10 flex gap-1 px-4 pt-3 sm:px-8" aria-label="Stages">
           {STEPS.map((s, i) => (
             <li key={s.k} className="flex-1" aria-current={i === active ? "step" : undefined}>
-              <span className="block h-[2px] overflow-hidden rounded-full bg-white/10">
-                <span className="block h-full bg-[#2EE6A6] shadow-[0_0_8px_#2EE6A6]" style={{ width: `${clamp(p * n - i) * 100}%` }} />
+              <span className="block h-[2px] overflow-hidden rounded-full bg-[#DDE5E7]">
+                <span className="block h-full bg-[#1E6B62]" style={{ width: `${clamp(p * n - i) * 100}%` }} />
               </span>
-              <span className={`mt-1.5 block font-[family-name:var(--aq-mono)] text-[11px] tracking-wide transition-colors duration-300 ${i === active ? "text-[#E6EEF3]" : "text-white/30"}`}>
+              <span className={`mt-1.5 block font-[family-name:var(--aq-mono)] text-[11px] tracking-wide transition-colors duration-300 ${i === active ? "text-[#0C1A26]" : "text-[#8A98A1]"}`}>
                 {s.k} {s.name}
               </span>
             </li>
@@ -666,8 +665,8 @@ function Pinned() {
             {STEPS.map((s, i) => (
               <div key={s.k} aria-hidden={i !== active} className="absolute inset-x-0 top-3 transition-all duration-300 ease-out"
                 style={{ opacity: i === active ? 1 : 0, transform: `translateY(${(i - active) * 10}px)` }}>
-                <p className="text-[clamp(1.2rem,1.9vw,1.6rem)] font-semibold leading-tight tracking-[-0.025em] text-[#E6EEF3]">{s.title}</p>
-                <p className="mx-auto mt-2 max-w-[720px] text-[14.5px] leading-relaxed text-[#8DA2B3]">{s.body}</p>
+                <p className="text-[clamp(1.2rem,1.9vw,1.6rem)] font-semibold leading-tight tracking-[-0.025em] text-[#0C1A26]">{s.title}</p>
+                <p className="mx-auto mt-2 max-w-[720px] text-[14.5px] leading-relaxed text-[#5A6874]">{s.body}</p>
               </div>
             ))}
           </div>
@@ -695,7 +694,7 @@ function StaticStep({ i }: { i: number }) {
         <p className="font-[family-name:var(--aq-mono)] text-[12.5px] text-[#1E6B62]">{s.k} / 0{STEPS.length} · {s.name}</p>
         <h3 className="mt-3 text-[1.5rem] font-semibold leading-tight tracking-[-0.025em]">{s.title}</h3>
         <p className="mt-3 text-[16px] leading-relaxed text-[#3E4C58]">{s.body}</p>
-        {i === 6 && <p className="mt-4 rounded-2xl bg-[#0C1A26] p-5 font-[family-name:var(--aq-serif)] text-[1.15rem] leading-snug text-white">{RULE}</p>}
+        {i === 6 && <p className="mt-4 rounded-2xl bg-[#E3EEEC] p-5 font-[family-name:var(--aq-serif)] text-[1.15rem] leading-snug text-[#0C1A26]">{RULE}</p>}
         {s.detail.length > 0 && (
           <dl className="mt-5 divide-y divide-[#E3E8EA] text-[15px]">
             {s.detail.map(([k, v]) => (
@@ -707,7 +706,7 @@ function StaticStep({ i }: { i: number }) {
           </dl>
         )}
       </div>
-      <div className="min-w-0 overflow-hidden rounded-3xl bg-[radial-gradient(ellipse_at_50%_30%,#1C2A66_0%,#0D1538_45%,#060A1C_100%)] p-2" aria-hidden>
+      <div className="min-w-0 overflow-hidden rounded-3xl border border-[#E3E8EA] bg-[#F5F7F7] p-2" aria-hidden>
         <Scaled id={`st${i}`} fitHeight={false} rootRef={root} />
       </div>
     </li>
@@ -727,7 +726,10 @@ const AMBIENT_CSS = `
 export default function CandleStory() {
   const [mode, setMode] = useState<"pinned" | "static" | null>(null);
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 900px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)");
+    // Keep the scroll-scrubbed transformation on desktop even when the OS asks
+    // to reduce ambient motion. Nothing autoplays; the user drives every stage
+    // with the page scroll. Small screens use the stepped static presentation.
+    const mq = window.matchMedia("(min-width: 900px) and (min-height: 600px)");
     const update = () => setMode(mq.matches ? "pinned" : "static");
     update();
     mq.addEventListener("change", update);

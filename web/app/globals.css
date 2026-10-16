@@ -4,6 +4,11 @@
 
 :root {
   color-scheme: dark;
+  /* Keep every site's legacy font hook on the same Inter family. */
+  --font-mono: var(--font-sans);
+  --aq-sans: var(--font-sans);
+  --aq-serif: var(--font-sans);
+  --aq-mono: var(--font-sans);
 }
 
 html,

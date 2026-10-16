@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const sans = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Aether Quant: AI algo strategies on Hyperliquid", template: "%s · Aether Quant" },
@@ -15,7 +14,7 @@ export const viewport: Viewport = { themeColor: "#05080d", width: "device-width"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-ink-950 font-sans text-mist-100">{children}</body>
     </html>
   );

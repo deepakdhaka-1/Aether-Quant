@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { fontVars } from "./fonts";
+import { LogoMark } from "@/components/ui/Logo";
 
 export const NAV = [
   ["How it works", "/#how"],
@@ -18,18 +18,12 @@ export const pillDark = `inline-flex items-center justify-center rounded-full bg
 export const pillLine = `inline-flex items-center justify-center rounded-full border border-[#C9D2D7] bg-white/60 px-6 py-3 text-[15px] font-medium text-[#0C1A26] transition-colors hover:border-[#0C1A26] ${focus}`;
 
 export function Mark() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden>
-      <rect x="9" y="3" width="4" height="16" rx="1" fill="none" stroke="#0C1A26" strokeWidth="1.5" />
-      <path d="M11 0.5v2.5M11 19v2.5" stroke="#0C1A26" strokeWidth="1.5" />
-      <path d="M2 15 7 10l3 2.5L20 4" fill="none" stroke="#1E6B62" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+  return <LogoMark size={22} />;
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${fontVars} min-h-screen overflow-x-clip bg-[#F5F7F7] font-[family-name:var(--aq-sans)] text-[#0C1A26] antialiased`}>
+    <div className="min-h-screen overflow-x-clip bg-[#F5F7F7] font-[family-name:var(--aq-sans)] text-[#0C1A26] antialiased">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-white focus:px-3 focus:py-2">
         Skip to content
       </a>

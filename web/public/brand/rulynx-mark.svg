@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Rulynx mark concept</title>
+  <path d="M15 52V12h20a12 12 0 0 1 0 24H15m17 0 19 16" fill="none" stroke="#0C1A26" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m8 43 11-8 9 4 10-12 9 2 9-11" fill="none" stroke="#1E6B62" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="56" cy="18" r="3" fill="#7CF5D4" stroke="#0C1A26" stroke-width="1.5"/>
+</svg>
