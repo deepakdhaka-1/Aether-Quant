@@ -9,20 +9,21 @@ type Asset = {
   group: "Equities" | "Index" | "Commodities";
   color: string;
   logo: string;
+  logoSource?: "app";
 };
 const ASSETS: Asset[] = [
-  { name: "NVIDIA", ticker: "NVDA", group: "Equities", logo: "NVDA.png", color: "#76B900" },
-  { name: "Tesla", ticker: "TSLA", group: "Equities", logo: "TSLA.png", color: "#CC0000" },
-  { name: "Apple", ticker: "AAPL", group: "Equities", logo: "AAPL.png", color: "#111111" },
-  { name: "Microsoft", ticker: "MSFT", group: "Equities", logo: "MSFT.png", color: "#1F2328" },
+  { name: "NVIDIA", ticker: "NVDA", group: "Equities", logo: "nvidia-green.svg", logoSource: "app", color: "#76B900" },
+  { name: "Tesla", ticker: "TSLA", group: "Equities", logo: "tesla-red.svg", logoSource: "app", color: "#CC0000" },
+  { name: "Apple", ticker: "AAPL", group: "Equities", logo: "apple.svg", logoSource: "app", color: "#111111" },
+  { name: "Microsoft", ticker: "MSFT", group: "Equities", logo: "microsoft.svg", logoSource: "app", color: "#1F2328" },
   { name: "Amazon", ticker: "AMZN", group: "Equities", logo: "AMZN.png", color: "#1F2328" },
-  { name: "Alphabet", ticker: "GOOGL", group: "Equities", logo: "GOOGL.png", color: "#4285F4" },
-  { name: "Meta", ticker: "META", group: "Equities", logo: "META.png", color: "#0467DF" },
+  { name: "Alphabet", ticker: "GOOGL", group: "Equities", logo: "google.svg", logoSource: "app", color: "#4285F4" },
+  { name: "Meta", ticker: "META", group: "Equities", logo: "meta-blue.svg", logoSource: "app", color: "#0467DF" },
   { name: "US Tech 100", ticker: "XYZ100", group: "Index", logo: "XYZ100.png", color: "#4B4FD8" },
   { name: "Gold", ticker: "GOLD", group: "Commodities", logo: "GOLD.png", color: "#B8892B" },
-  { name: "Silver", ticker: "SILVER", group: "Commodities", logo: "SILVER.svg", color: "#7D8794" },
-  { name: "WTI crude", ticker: "CL", group: "Commodities", logo: "CL.png", color: "#343434" },
-  { name: "Natural gas", ticker: "NATGAS", group: "Commodities", logo: "NATGAS.png", color: "#2F7DE1" },
+  { name: "Silver", ticker: "SILVER", group: "Commodities", logo: "silver.svg", logoSource: "app", color: "#7D8794" },
+  { name: "WTI crude", ticker: "CL", group: "Commodities", logo: "crude.svg", logoSource: "app", color: "#343434" },
+  { name: "Natural gas", ticker: "NATGAS", group: "Commodities", logo: "natural-gas.svg", logoSource: "app", color: "#2F7DE1" },
   { name: "Copper", ticker: "COPPER", group: "Commodities", logo: "COPPER.png", color: "#B06A3B" },
 ];
 type DailyCandle = { time: number; open: number; high: number; low: number; close: number };
@@ -36,9 +37,9 @@ const RINGS = [
 
 function Logo({ asset, size = 30 }: { asset: Asset; size?: number }) {
   const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const src = baseUrl
-    ? `${baseUrl}/storage/v1/object/public/asset-icons/${asset.logo}`
-    : `/assets/market-logos/${asset.logo}`;
+  const src = asset.logoSource === "app" || !baseUrl
+    ? `/assets/market-logos/${asset.logo}`
+    : `${baseUrl}/storage/v1/object/public/asset-icons/${asset.logo}`;
   return <img aria-hidden="true" alt="" src={src} className="block shrink-0 object-contain" style={{ width: size, height: size }} />;
 }
 
@@ -62,7 +63,7 @@ function PriceSparkline({ candles, ticker }: { candles: DailyCandle[]; ticker: s
 export default function MarketOrbit() {
   const [active, setActive] = useState<Asset | null>(null);
   const activeRef = useRef<Asset | null>(null);
-  const motion = useRef({ speed: 1, px: 0, py: 0, tx: 0, ty: 0, rotation: 0 });
+  const motion = useRef({ speed: 1, rotation: 0 });
   const orbElements = useRef(new Map<string, HTMLButtonElement>());
   const [size, setSize] = useState({ width: 900, height: 486 });
   const [reduced, setReduced] = useState(false);
@@ -103,12 +104,10 @@ export default function MarketOrbit() {
       const dt = Math.min(50, now - last) / 1000;
       last = now;
       const m = motion.current;
+      // Pause only while an asset is selected under the pointer. Orb positions
+      // no longer receive cursor parallax, so hovering empty ring space stays smooth.
       m.speed += ((activeRef.current ? 0 : 1) - m.speed) * Math.min(1, dt * 4);
       m.rotation += dt * m.speed;
-      m.px += (m.tx - m.px) * dt * 3;
-      m.py += (m.ty - m.py) * dt * 3;
-      const verticalSquash = squash + m.py * 0.08;
-
       for (const { asset, ring, index, count } of assets) {
         const element = orbElements.current.get(asset.ticker);
         if (!element) continue;
@@ -117,13 +116,14 @@ export default function MarketOrbit() {
         const sin = Math.sin(angle);
         const depth = (sin + 1) / 2;
         const radius = ring.radius * width;
-        const x = cx + Math.cos(angle) * radius + m.px * 30 * (ringIndex + 1);
-        const y = cy + sin * radius * verticalSquash;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + sin * radius * squash;
         const isActive = activeRef.current?.ticker === asset.ticker;
         const scale = isActive ? 1.15 : 0.72 + depth * 0.38;
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-        element.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        // Keep the element's origin fixed and let the animation loop own its
+        // transform, matching the prototype. React must not compete with RAF
+        // for the same transform while hover state causes a rerender.
+        element.style.transform = `translate(${x}px,${y}px) scale(${scale})`;
         element.style.opacity = activeRef.current ? (isActive ? "1" : "0.35") : String(0.55 + depth * 0.45);
         element.style.zIndex = String(isActive ? 80 : (sin > 0 ? 55 : 10) + Math.round(depth * 20));
       }
@@ -223,7 +223,7 @@ export default function MarketOrbit() {
             </div>
           </div>
         </div>
-        <div id="market-stage" className={`relative mx-auto mt-10 aspect-[1.85] w-full max-w-[1040px] touch-pan-y max-sm:aspect-[1.05] ${reduced ? "hidden" : ""}`} onPointerMove={(event) => { const rect = event.currentTarget.getBoundingClientRect(); motion.current.tx = (event.clientX - rect.left) / rect.width - .5; motion.current.ty = (event.clientY - rect.top) / rect.height - .5; }} onPointerLeave={() => { motion.current.tx = 0; motion.current.ty = 0; }}>
+        <div id="market-stage" className={`relative mx-auto mt-10 aspect-[1.85] w-full max-w-[1040px] touch-pan-y max-sm:aspect-[1.05] ${reduced ? "hidden" : ""}`} onPointerLeave={() => setSelection(null)}>
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
             {RINGS.map((ring, i) => <ellipse key={ring.group} cx={cx} cy={cy} rx={ring.radius * width} ry={ring.radius * width * squash} fill="none" stroke={ring.group === "Index" ? "#C4C6F2" : "#DCDCD7"} strokeDasharray={ring.group === "Equities" ? "4 6" : ring.group === "Index" ? "2 6" : undefined} style={{ animation: `marketOrbitRingsIn 900ms ease-out ${i * 150}ms both` }} />)}
           </svg>
@@ -231,15 +231,10 @@ export default function MarketOrbit() {
             <span aria-hidden="true" className="pointer-events-none absolute -inset-[14px] rounded-full border border-[#4B4FD8]/20" style={{ animation: "marketOrbitPulse 3.2s ease-out infinite" }} />
             <div><b className="block font-semibold leading-none tracking-tight" style={{ fontSize: width * (width < 640 ? 0.22 : 0.15) * 0.16 }}>Aether</b><span className="font-[family-name:var(--aq-mono)] text-[10px] uppercase tracking-[.14em] text-[#5A6874]">Quant core</span></div>
           </div>
-          {assets.map(({ asset, ring, index, count }) => {
-            const ringIndex = RINGS.indexOf(ring);
-            const angle = (index / count) * Math.PI * 2 + ringIndex * 0.7 + motion.current.rotation * ring.speed * 6;
-            const sin = Math.sin(angle), depth = (sin + 1) / 2, radius = ring.radius * width;
-            const x = cx + Math.cos(angle) * radius + motion.current.px * 30 * (ringIndex + 1), y = cy + sin * radius * (squash + motion.current.py * .08);
+          {assets.map(({ asset }) => {
             const isActive = selected?.ticker === asset.ticker;
             const diameter = width < 640 ? 40 : 66;
-            const scale = isActive ? 1.15 : 0.72 + depth * 0.38;
-            return <button key={asset.ticker} ref={(element) => { if (element) orbElements.current.set(asset.ticker, element); else orbElements.current.delete(asset.ticker); }} type="button" aria-label={`${asset.name}, ${asset.ticker}, ${asset.group}`} aria-pressed={isActive} onPointerEnter={(event) => { if (event.pointerType === "mouse") setSelection(asset); }} onPointerLeave={(event) => { if (event.pointerType === "mouse") setSelection(null); }} onFocus={() => setSelection(asset)} onBlur={() => setSelection(null)} onClick={(event) => { event.stopPropagation(); setSelection(isActive ? null : asset); }} className="absolute z-10 grid -translate-x-1/2 -translate-y-1/2 place-items-center border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4B4FD8]" style={{ left: x, top: y, width: diameter, height: diameter, opacity: selected ? (isActive ? 1 : 0.35) : 0.55 + depth * 0.45, zIndex: isActive ? 80 : (sin > 0 ? 55 : 10) + Math.round(depth * 20), transform: `translate(-50%,-50%) scale(${scale})`, animation: `marketOrbitIntro 700ms ease-out ${250 + (index + ringIndex * 2) * 55}ms backwards` }}><span className={`grid h-full w-full place-items-center rounded-full bg-white shadow-[0_10px_24px_-10px_rgba(0,0,0,.32)] transition-[transform,box-shadow] duration-300 ${isActive ? "ring-2 ring-[#4B4FD8]" : ""}`} style={{ transform: `scale(${isActive ? 1.35 : 1})` }}><Logo asset={asset} size={width < 640 ? 22 : 30} /></span><span className={`pointer-events-none absolute top-full mt-3 whitespace-nowrap font-[family-name:var(--aq-mono)] text-[10px] ${isActive ? "text-[#111214]" : "sr-only"}`}>{asset.ticker}</span></button>;
+            return <button key={asset.ticker} ref={(element) => { if (element) orbElements.current.set(asset.ticker, element); else orbElements.current.delete(asset.ticker); }} type="button" aria-label={`${asset.name}, ${asset.ticker}, ${asset.group}`} aria-pressed={isActive} onPointerEnter={(event) => { if (event.pointerType === "mouse") setSelection(asset); }} onPointerLeave={(event) => { if (event.pointerType === "mouse") setSelection(null); }} onFocus={() => setSelection(asset)} onBlur={() => setSelection(null)} onClick={(event) => { event.stopPropagation(); setSelection(isActive ? null : asset); }} className="absolute left-0 top-0 z-10 grid place-items-center border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4B4FD8]" style={{ width: diameter, height: diameter, marginLeft: -diameter / 2, marginTop: -diameter / 2, opacity: selected ? (isActive ? 1 : 0.35) : undefined, zIndex: isActive ? 80 : undefined }}><span className={`grid h-full w-full place-items-center rounded-full bg-white shadow-[0_10px_24px_-10px_rgba(0,0,0,.32)] transition-[transform,box-shadow] duration-300 ${isActive ? "ring-2 ring-[#4B4FD8]" : ""}`} style={{ transform: `scale(${isActive ? 1.35 : 1})` }}><Logo asset={asset} size={width < 640 ? 22 : 30} /></span><span className={`pointer-events-none absolute top-full mt-3 whitespace-nowrap font-[family-name:var(--aq-mono)] text-[10px] ${isActive ? "text-[#111214]" : "sr-only"}`}>{asset.ticker}</span></button>;
           })}
           {selected && <div role="status" aria-live="polite" className="pointer-events-none absolute left-1/2 top-1/2 z-40 w-[min(260px,58%)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#E7E7E4] bg-white/95 p-4 text-[#111214] shadow-[0_30px_70px_-24px_rgba(20,20,60,.35)] backdrop-blur-md animate-[marketOrbitCardIn_450ms_cubic-bezier(.2,.8,.2,1)_both]">
             <div className="flex items-center gap-3"><Logo asset={selected} size={48} /><div><p className="text-[17px] font-semibold">{selected.name}</p><p className="font-[family-name:var(--aq-mono)] text-[11px] text-[#6B6F76]">{selected.ticker} · {selected.group === "Commodities" ? "Commodity" : selected.group === "Equities" ? "US equity" : selected.group}</p></div></div>
