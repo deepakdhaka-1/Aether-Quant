@@ -28,25 +28,25 @@ export function Shell({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <header className="sticky top-0 z-50 border-b border-[#E3E8EA] bg-[#F5F7F7]/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-6 px-4 sm:px-8">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-2 px-3 sm:gap-6 sm:px-8">
           <Link href="/" className={`flex items-center gap-2.5 ${focus}`}>
             <Mark />
-            <span className="text-[17px] font-semibold tracking-[-0.02em]">Aether Quant</span>
+            <span className="text-[15px] font-semibold tracking-[-0.02em] sm:text-[17px]">Aether Quant</span>
           </Link>
           <nav aria-label="Primary" className="hidden items-center gap-7 text-[14px] text-[#3E4C58] lg:flex">
             {NAV.slice(0, 4).map(([l, h]) => (
               <Link key={h} href={h} className={`transition-colors hover:text-[#0C1A26] ${focus}`}>{l}</Link>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <nav aria-label="Resources" className="hidden items-center gap-5 text-[14px] text-[#3E4C58] lg:flex">
               {NAV.slice(4).map(([l, h]) => (
                 <Link key={h} href={h} className={`transition-colors hover:text-[#0C1A26] ${focus}`}>{l}</Link>
               ))}
             </nav>
-            <Link href="/dashboard" className={`${pillDark} !px-4 !py-2 !text-[14px]`}>Dashboard</Link>
+            <Link href="/dashboard" className={`${pillDark} !px-3 !py-2 !text-[13px] sm:!px-4 sm:!text-[14px]`}>Dashboard</Link>
             <details className="relative lg:hidden">
-              <summary className={`flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[#C9D2D7] [&::-webkit-details-marker]:hidden ${focus}`} aria-label="Menu">
+              <summary className={`flex h-10 w-10 shrink-0 cursor-pointer list-none items-center justify-center rounded-full border border-[#C9D2D7] [&::-webkit-details-marker]:hidden ${focus}`} aria-label="Menu">
                 <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden><path d="M2 5h14M2 9h14M2 13h14" stroke="#0C1A26" strokeWidth="1.6" /></svg>
               </summary>
               <nav aria-label="Mobile" className="absolute right-0 mt-2 w-52 rounded-2xl border border-[#E3E8EA] bg-white p-2 shadow-lg">
@@ -61,7 +61,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <main id="main">{children}</main>
       <footer className="bg-[#0C1A26] text-[#B4C4CF]">
         <div className="mx-auto max-w-[1240px] px-4 py-16 sm:px-8">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
             <div>
               <p className="text-[18px] font-semibold tracking-[-0.02em] text-white">Aether Quant</p>
               <p className="mt-3 max-w-[34ch] text-[14.5px] leading-relaxed">

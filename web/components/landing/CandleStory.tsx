@@ -1156,8 +1156,11 @@ function StaticStep({ i }: { i: number }) {
           </dl>
         )}
       </div>
-      <div className="min-w-0 overflow-hidden rounded-3xl border border-[#E3E8EA] bg-[#F5F7F7] p-2" aria-hidden>
-        <Scaled id={`st${i}`} fitHeight={false} rootRef={root} />
+      <p className="text-right text-[11px] text-[#5A6874] sm:hidden">Swipe diagram to explore →</p>
+      <div className="min-w-0 overflow-x-auto overscroll-x-contain rounded-3xl border border-[#E3E8EA] bg-[#F5F7F7] p-2" aria-hidden>
+        <div className="min-w-[720px] sm:min-w-0">
+          <Scaled id={`st${i}`} fitHeight={false} rootRef={root} />
+        </div>
       </div>
     </li>
   );
