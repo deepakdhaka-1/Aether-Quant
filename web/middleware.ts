@@ -31,7 +31,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
   if (data.user && isProtected(path)) {
-    const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    const { data: aal, error } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error || !aal) return new NextResponse("Could not verify session assurance. Please retry.", { status: 503 });
     if (aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
       if (path.startsWith("/api/")) return NextResponse.json({ error: "Authenticator verification required", code: "mfa_required" }, { status: 403 });
       const url = req.nextUrl.clone();

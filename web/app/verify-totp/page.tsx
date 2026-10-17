@@ -15,7 +15,7 @@ export default async function VerifyTotpPage({ searchParams }: { searchParams: P
   const { data: userData } = await sb.auth.getUser();
   if (!userData.user) redirect(`/login?next=${encodeURIComponent(next)}`);
   const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (aal.currentLevel === "aal2" || aal.nextLevel !== "aal2") redirect(next);
+  if (aal && (aal.currentLevel === "aal2" || aal.nextLevel !== "aal2")) redirect(next);
 
   return (
     <Shell>

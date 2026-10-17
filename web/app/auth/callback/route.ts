@@ -7,7 +7,7 @@ function safeNext(value: string | null) {
     : "/dashboard";
 }
 
-// OAuth, email confirmation, and password recovery links land here with a PKCE code.
+// Email confirmation, passwordless sign-in, and recovery links land here with a PKCE code.
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const next = safeNext(url.searchParams.get("next"));

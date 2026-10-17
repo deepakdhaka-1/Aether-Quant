@@ -87,7 +87,7 @@ export function LoginCard({ next, referral, initialError, initialMode = "signin"
     setError(null);
     setBusy("verify-signup");
     try {
-      const { error: authError } = await supabaseBrowser().auth.verifyOtp({ email, token: confirmationCode, type: "signup" });
+      const { error: authError } = await supabaseBrowser().auth.verifyOtp({ email, token: confirmationCode, type: "email" });
       if (authError) throw authError;
       go();
     } catch (e) {
@@ -119,7 +119,7 @@ export function LoginCard({ next, referral, initialError, initialMode = "signin"
     try {
       const { error: authError } = await supabaseBrowser().auth.resend({ type: "signup", email });
       if (authError) setError(authError.message);
-      else setNote(`A new confirmation link was sent to ${email}.`);
+      else setNote(`A new confirmation link and code were sent to ${email}.`);
     } catch (e) {
       setError((e as Error).message);
     } finally {
