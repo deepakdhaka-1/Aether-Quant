@@ -7,7 +7,26 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { connect, personalSign, walletError, type DiscoveredWallet } from "@/lib/wallets";
 import { WalletPicker } from "@/components/wallet/WalletPicker";
 import { LogoMark } from "@/components/ui/Logo";
-import { Banner, btn, cx, input } from "@/components/ui";
+import { cx } from "@/components/ui";
+
+// Light styles matching the public site (the in-app components keep the dark theme).
+const focus = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1E6B62]";
+const L = {
+  primary: `inline-flex items-center justify-center gap-2 rounded-full bg-[#0C1A26] px-5 text-[15px] font-medium text-white transition-colors hover:bg-[#1E6B62] disabled:opacity-60 ${focus}`,
+  ghost: `inline-flex items-center justify-center gap-2 rounded-full border border-[#C9D2D7] bg-white px-5 text-[15px] font-medium text-[#0C1A26] transition-colors hover:border-[#0C1A26] disabled:opacity-60 ${focus}`,
+  back: `inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#C9D2D7] bg-white text-[#0C1A26] hover:border-[#0C1A26] ${focus}`,
+  input: `w-full rounded-xl border border-[#D5DDE0] bg-white px-3.5 py-2.5 text-[15px] text-[#0C1A26] placeholder:text-[#8A98A1] focus:border-[#1E6B62] focus:outline-none focus:ring-2 focus:ring-[#1E6B62]/20`,
+  label: "mb-1.5 block text-[13px] font-medium text-[#3E4C58]",
+};
+
+function Notice({ tone, children }: { tone?: "bad"; children: React.ReactNode }) {
+  return (
+    <div role={tone === "bad" ? "alert" : "status"} className={cx("rounded-xl border px-3.5 py-2.5 text-[13.5px] leading-relaxed",
+      tone === "bad" ? "border-[#F0C9C9] bg-[#FDF3F3] text-[#9B2C2C]" : "border-[#CFE3DE] bg-[#EEF6F4] text-[#1E4F46]")}>
+      {children}
+    </div>
+  );
+}
 
 type View = "home" | "wallet" | "email";
 
@@ -109,47 +128,47 @@ export function LoginCard({ next, referral, initialError }: { next: string; refe
   };
 
   return (
-    <div className="w-full max-w-[420px] rounded-3xl border border-ink-700 bg-ink-900/90 p-6 shadow-glow backdrop-blur sm:p-8">
+    <div className="w-full max-w-[440px] rounded-[28px] border border-[#E3E8EA] bg-white p-6 shadow-[0_24px_60px_-30px_rgba(12,26,38,.25)] sm:p-9">
       <div className="mb-6 flex items-center gap-3">
         {view !== "home" ? (
-          <button type="button" onClick={() => { setView("home"); setError(null); }} className={btn.small} aria-label="Back">
+          <button type="button" onClick={() => { setView("home"); setError(null); }} className={L.back} aria-label="Back">
             <ArrowLeft className="h-3.5 w-3.5" />
           </button>
         ) : (
           <LogoMark size={30} />
         )}
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-[1.35rem] font-semibold tracking-[-0.02em] text-[#0C1A26]">
             {view === "wallet" ? "Choose a wallet" : view === "email" ? (mode === "signin" ? "Sign in with email" : "Create your account") : "Sign in to Aether Quant"}
           </h1>
-          <p className="text-xs text-mist-400">
-            {view === "wallet" ? "You'll sign a message. No transaction, no gas." : "Follow AI strategies. Keep custody."}
+          <p className="mt-0.5 text-[13px] text-[#5A6874]">
+            {view === "wallet" ? "You'll sign a message. No transaction, no gas." : "Follow tested strategies. Keep custody."}
           </p>
         </div>
       </div>
 
-      {error && <div className="mb-4"><Banner tone="bad">{error}</Banner></div>}
-      {note && <div className="mb-4"><Banner>{note}</Banner></div>}
+      {error && <div className="mb-4"><Notice tone="bad">{error}</Notice></div>}
+      {note && <div className="mb-4"><Notice>{note}</Notice></div>}
 
       {view === "home" && (
         <div className="space-y-3">
-          <button type="button" className={cx(btn.primary, "w-full py-3")} onClick={() => setView("wallet")}>
+          <button type="button" className={cx(L.primary, "w-full py-3")} onClick={() => setView("wallet")}>
             <Wallet className="h-4 w-4" aria-hidden /> Continue with wallet
           </button>
-          <button type="button" className={cx(btn.ghost, "w-full py-3")} onClick={withGoogle} disabled={!!busy}>
+          <button type="button" className={cx(L.ghost, "w-full py-3")} onClick={withGoogle} disabled={!!busy}>
             {busy === "google" ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleG />} Continue with Google
           </button>
-          <button type="button" className={cx(btn.ghost, "w-full py-3")} onClick={() => setView("email")}>
+          <button type="button" className={cx(L.ghost, "w-full py-3")} onClick={() => setView("email")}>
             <Mail className="h-4 w-4" aria-hidden /> Continue with email
           </button>
         </div>
       )}
 
-      {view === "wallet" && <WalletPicker onPick={withWallet} busy={busy} />}
+      {view === "wallet" && <WalletPicker onPick={withWallet} busy={busy} light />}
 
       {view === "email" && (
         <form onSubmit={withEmail} className="space-y-3">
-          <div role="tablist" className="grid grid-cols-2 rounded-full border border-ink-700 p-1 text-xs">
+          <div role="tablist" className="grid grid-cols-2 rounded-full border border-[#D5DDE0] bg-[#F5F7F7] p-1 text-[13px]">
             {(["signin", "signup"] as const).map((m) => (
               <button
                 key={m}
@@ -157,20 +176,20 @@ export function LoginCard({ next, referral, initialError }: { next: string; refe
                 role="tab"
                 aria-selected={mode === m}
                 onClick={() => setMode(m)}
-                className={cx("rounded-full py-1.5 font-medium transition", mode === m ? "bg-ink-700 text-mist-100" : "text-mist-400")}
+                className={cx("rounded-full py-1.5 font-medium transition", mode === m ? "bg-white text-[#0C1A26] shadow-sm" : "text-[#5A6874] hover:text-[#0C1A26]")}
               >
                 {m === "signin" ? "Sign in" : "Sign up"}
               </button>
             ))}
           </div>
           <label className="block">
-            <span className="mb-1 block text-xs text-mist-400">Email</span>
-            <input className={input} type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <span className={L.label}>Email</span>
+            <input className={L.input} type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs text-mist-400">Password</span>
+            <span className={L.label}>Password</span>
             <input
-              className={input}
+              className={L.input}
               type="password"
               required
               minLength={8}
@@ -179,7 +198,7 @@ export function LoginCard({ next, referral, initialError }: { next: string; refe
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
-          <button type="submit" className={cx(btn.primary, "w-full py-3")} disabled={!!busy}>
+          <button type="submit" className={cx(L.primary, "w-full py-3")} disabled={!!busy}>
             {busy === "email" && <Loader2 className="h-4 w-4 animate-spin" />}
             {mode === "signin" ? "Sign in" : "Create account"}
           </button>
@@ -188,14 +207,14 @@ export function LoginCard({ next, referral, initialError }: { next: string; refe
 
       {(view === "email" ? mode === "signup" : view !== "home" || !!ref) && (
         <label className="mt-4 block">
-          <span className="mb-1 block text-xs text-mist-400">Referral code (optional)</span>
-          <input className={input} value={ref} onChange={(e) => setRef(e.target.value)} maxLength={64} />
+          <span className={L.label}>Referral code (optional)</span>
+          <input className={L.input} value={ref} onChange={(e) => setRef(e.target.value)} maxLength={64} />
         </label>
       )}
 
-      <p className="mt-6 text-center text-[11px] leading-relaxed text-mist-500">
-        By continuing you agree to the <a className="underline hover:text-mist-300" href="/legal/terms">Terms</a> and acknowledge the{" "}
-        <a className="underline hover:text-mist-300" href="/legal/risk">Risk disclosure</a>.
+      <p className="mt-7 text-center text-[12px] leading-relaxed text-[#5A6874]">
+        By continuing you agree to the <a className="underline hover:text-[#0C1A26]" href="/legal-terms">Terms</a> and acknowledge the{" "}
+        <a className="underline hover:text-[#0C1A26]" href="/legal-risk">Risk disclosure</a>.
       </p>
     </div>
   );

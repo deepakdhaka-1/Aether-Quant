@@ -1,5 +1,13 @@
 # Aether Quant: Operations runbook
 
+> **Runtime update:** the live runtime now runs on **Supabase Edge Functions + pg_cron**
+> (`ingest`, `signals`, `execute`, `fees`, `monitor`, `market-candles`). See
+> [EDGE_RUNTIME.md](EDGE_RUNTIME.md) for functions, schedules, secrets and deploy. The Python engine
+> and the Cloud Run / VM / Windows runners below are now only for research and backtesting.
+> The procedures in §4 (halt, kill switch, key rotation, markets, strategies) and the alert guide
+> in §5 still apply: the Edge functions read and write the same tables, and the live-gate and
+> builder variables are set with `npx supabase secrets set` instead of the engine `.env`.
+
 ## 1. Architecture
 
 ```
@@ -25,7 +33,9 @@
   aether-api (uvicorn aether.api:app): backtests / generation for the web app, private
 ```
 
-Runners: Cloud Run Jobs + Scheduler (`deploy/cloudrun.sh`), one VM with docker compose
+Live: Supabase Edge Functions on pg_cron (see EDGE_RUNTIME.md); the diagram above shows the
+original Python layout, which the Edge functions replace one-for-one.
+Python runners (research / backfills only): Cloud Run Jobs + Scheduler (`deploy/cloudrun.sh`), one VM with docker compose
 (`deploy/docker-compose.yml` + `deploy/scheduler.py` + `deploy/crontab`), or Windows Task Scheduler
 for local runs (`deploy/windows_tasks.ps1`). The image is `deploy/engine.Dockerfile` (context `engine/`).
 It contains no secrets.

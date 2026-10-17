@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Logo } from "@/components/ui/Logo";
 import { btn } from "@/components/ui";
+import { Shell } from "@/components/landing/SiteChrome";
 
 export function SiteHeader({ signedIn }: { signedIn: boolean }) {
   return (
@@ -27,8 +28,8 @@ export function SiteFooter() {
             <Image src="/brand/hyperliquid.svg" alt="Hyperliquid" width={96} height={18} className="h-4 w-auto opacity-80" />
           </div>
           <nav className="flex gap-4 text-xs text-mist-400" aria-label="Legal">
-            <Link href="/legal/terms" className="hover:text-mist-100">Terms</Link>
-            <Link href="/legal/risk" className="hover:text-mist-100">Risk disclosure</Link>
+            <Link href="/legal-terms" className="hover:text-mist-100">Terms</Link>
+            <Link href="/legal-risk" className="hover:text-mist-100">Risk disclosure</Link>
           </nav>
         </div>
         <p className="max-w-4xl text-[11px] leading-relaxed text-mist-500">
@@ -42,18 +43,18 @@ export function SiteFooter() {
   );
 }
 
+// Legal pages share the public site's header, footer and light theme.
 export function LegalPage({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
   return (
-    <div className="min-h-screen">
-      <SiteHeader signedIn={false} />
-      <main className="mx-auto max-w-3xl px-4 pb-20 pt-8 sm:px-6">
-        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-        <p className="mt-2 font-mono text-xs text-mist-500">Last updated {updated}</p>
-        <div className="mt-8 space-y-6 text-sm leading-relaxed text-mist-300 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-mist-100 [&_li]:ml-5 [&_li]:list-disc [&_ul]:space-y-1.5">
+    <Shell>
+      <article className="mx-auto max-w-[760px] px-4 pb-24 pt-14 sm:px-8 sm:pt-20">
+        <p className="text-[13px] font-medium text-[#1E6B62]">Legal</p>
+        <h1 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-[#0C1A26]">{title}</h1>
+        <p className="mt-3 text-[13px] text-[#5A6874]">Last updated {updated}</p>
+        <div className="mt-10 space-y-8 border-t border-[#DDE5E7] pt-10 text-[15.5px] leading-relaxed text-[#3E4C58] [&_h2]:mb-2.5 [&_h2]:text-[1.1rem] [&_h2]:font-semibold [&_h2]:tracking-[-0.01em] [&_h2]:text-[#0C1A26] [&_li]:ml-5 [&_li]:list-disc [&_li]:pl-1 [&_ul]:space-y-2 [&_a]:text-[#1E6B62] [&_a]:underline">
           {children}
         </div>
-      </main>
-      <SiteFooter />
-    </div>
+      </article>
+    </Shell>
   );
 }

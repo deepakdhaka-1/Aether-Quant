@@ -28,10 +28,13 @@ export function WalletPicker({
   onPick,
   busy,
   disabled,
+  light,
 }: {
   onPick: (w: DiscoveredWallet) => void;
   busy?: string | null;
   disabled?: boolean;
+  /** Light theme for the public pages (sign-in); the app keeps the dark one. */
+  light?: boolean;
 }) {
   const { wallets, scanned } = useWallets();
   const detected = new Set(wallets.map((w) => w.info.rdns));
@@ -54,22 +57,24 @@ export function WalletPicker({
             disabled={disabled || !!busy}
             onClick={() => onPick(w)}
             className={cx(
-              "flex w-full items-center gap-3 rounded-xl border border-ink-700 bg-ink-850 px-3.5 py-3 text-left text-sm transition",
-              "hover:border-aether/50 hover:bg-ink-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-aether disabled:opacity-60",
+              "flex w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 disabled:opacity-60",
+              light
+                ? "border-[#D5DDE0] bg-white hover:border-[#0C1A26] focus-visible:outline-[#1E6B62]"
+                : "border-ink-700 bg-ink-850 hover:border-aether/50 hover:bg-ink-800 focus-visible:outline-aether",
             )}
           >
             <WalletIcon icon={w.info.icon || featured?.logo} name={w.info.name} />
-            <span className="flex-1 font-medium text-mist-100">{w.info.name}</span>
+            <span className={cx("flex-1 font-medium", light ? "text-[#0C1A26]" : "text-mist-100")}>{w.info.name}</span>
             {isBusy ? (
-              <Loader2 className="h-4 w-4 animate-spin text-aether" aria-label="Waiting for wallet" />
+              <Loader2 className={cx("h-4 w-4 animate-spin", light ? "text-[#1E6B62]" : "text-aether")} aria-label="Waiting for wallet" />
             ) : (
-              <span className="font-mono text-[10px] uppercase tracking-wider text-aether">Detected</span>
+              <span className={cx("font-mono text-[10px] uppercase tracking-wider", light ? "text-[#1E6B62]" : "text-aether")}>Detected</span>
             )}
           </button>
         );
       })}
       {scanned && wallets.length === 0 && (
-        <p className="rounded-xl border border-dashed border-ink-700 px-3.5 py-3 text-xs text-mist-400">
+        <p className={cx("rounded-xl border border-dashed px-3.5 py-3 text-xs", light ? "border-[#C9D2D7] text-[#5A6874]" : "border-ink-700 text-mist-400")}>
           No browser wallet detected. Install one below, then reload this page.
         </p>
       )}
@@ -79,7 +84,7 @@ export function WalletPicker({
           href={f.install}
           target="_blank"
           rel="noreferrer"
-          className="flex w-full items-center gap-3 rounded-xl border border-ink-800 px-3.5 py-3 text-sm text-mist-400 transition hover:border-ink-600 hover:text-mist-100"
+          className={cx("flex w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-sm transition", light ? "border-[#E3E8EA] text-[#5A6874] hover:border-[#0C1A26] hover:text-[#0C1A26]" : "border-ink-800 text-mist-400 hover:border-ink-600 hover:text-mist-100")}
         >
           <WalletIcon icon={f.logo} name={f.name} />
           <span className="flex-1">{f.name}</span>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { LoginCard } from "@/components/auth/LoginCard";
-import { Logo } from "@/components/ui/Logo";
+import { Shell } from "@/components/landing/SiteChrome";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Sign in" };
@@ -20,13 +20,10 @@ export default async function LoginPage({
   if (data.user) redirect(next);
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10">
-      <div className="bg-grid mask-fade pointer-events-none absolute inset-0" aria-hidden />
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-aether/10 blur-3xl" aria-hidden />
-      <div className="relative mb-8"><Logo /></div>
-      <div className="relative w-full flex justify-center">
+    <Shell>
+      <div className="flex min-h-[calc(100svh-4rem)] items-center justify-center px-4 py-16 sm:py-20">
         <LoginCard next={next} referral={sp.ref} initialError={sp.error} />
       </div>
-    </main>
+    </Shell>
   );
 }

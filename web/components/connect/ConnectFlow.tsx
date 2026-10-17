@@ -159,8 +159,8 @@ export function ConnectFlow() {
             <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-ink-700 p-3.5 text-sm">
               <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#7cf5d4]" />
               <span className="text-mist-300">
-                I understand the above and accept the <a href="/legal/terms" target="_blank" className="underline">Terms</a> and{" "}
-                <a href="/legal/risk" target="_blank" className="underline">Risk disclosure</a>. Trading leveraged perpetuals can lose more than expected.
+                I understand the above and accept the <a href="/legal-terms" target="_blank" className="underline">Terms</a> and{" "}
+                <a href="/legal-risk" target="_blank" className="underline">Risk disclosure</a>. Trading leveraged perpetuals can lose more than expected.
               </span>
             </label>
             <button type="button" className={btn.primary} disabled={!terms} onClick={() => setStep(1)}>Continue</button>

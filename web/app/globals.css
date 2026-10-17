@@ -22,6 +22,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* No italics anywhere: BDO Grotesk has no italic, and we never want a browser-faked slant. */
+em, i, cite, dfn, var, address, blockquote {
+  font-style: normal;
+}
+html {
+  font-synthesis-style: none;
+}
+
 ::selection {
   background: rgba(124, 245, 212, 0.3);
 }

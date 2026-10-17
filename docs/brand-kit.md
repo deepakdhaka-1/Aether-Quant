@@ -16,7 +16,7 @@
 
 The working mark combines an open A-shaped frame, a horizontal rule, and a rising signal path. The frame represents the A in Aether; the line crossing it represents measured market movement and a rule that can be inspected. The mark is custom-drawn for this product in `web/public/brand/aether-quant-mark.svg` and used by the shared app and landing-page logo component.
 
-Use the mark in its original proportions. Keep clear space at least the width of the signal endpoint around it. Do not rotate, skew, add gradients, or place it over busy artwork. Pair it with the wordmark “Aether Quant” in Inter, semibold; retain the space between the words. Use the dark teal mark on light surfaces and the mint signal line as the accent. The dark UI may use a light mark variant when added later.
+Use the mark in its original proportions. Keep clear space at least the width of the signal endpoint around it. Do not rotate, skew, add gradients, or place it over busy artwork. Pair it with the wordmark “Aether Quant” in BDO Grotesk, semibold; retain the space between the words. Use the dark teal mark on light surfaces and the mint signal line as the accent. The dark UI may use a light mark variant when added later.
 
 The mark was authored in this repository; that does not prove global uniqueness. No comprehensive visual trademark search has been completed.
 
@@ -35,10 +35,14 @@ Use ink for primary text on light surfaces and paper for text on ink. Deep teal 
 
 ## Typography
 
-- **Family:** Inter throughout the product.
-- **Display:** Inter semibold or bold, tight but readable line spacing.
-- **Body:** Inter regular, comfortable line height.
-- **Numbers and labels:** Inter with tabular numerals where alignment matters. Avoid switching to a different typeface for data.
+- **Family:** BDO Grotesk throughout the product and site (SIL Open Font License 1.1, from
+  [LCTipografi/BDO-Grotesk](https://github.com/LCTipografi/BDO-Grotesk)). Self-hosted in
+  `web/app/fonts/bdo-grotesk/` with its `OFL.txt`; weights 300–700.
+- **No italics, anywhere.** The family has no italic and we never let the browser fake one. For
+  emphasis inside a headline, drop to a lighter weight instead.
+- **Display:** BDO Grotesk semibold or bold, tight but readable line spacing.
+- **Body:** BDO Grotesk regular, comfortable line height.
+- **Numbers and labels:** the same family; avoid switching to a different typeface for data.
 
 ## Voice and sample copy
 

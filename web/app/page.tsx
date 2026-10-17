@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Shell, focus, pillDark, pillLine } from "@/components/landing/SiteChrome";
 import StoryLoader from "@/components/landing/StoryLoader";
 import MarketOrbit from "@/components/landing/MarketOrbit";
+import GateFunnel from "@/components/landing/sections/GateFunnel";
+import FeeCalculator, { ZeroFees } from "@/components/landing/sections/FeeCalculator";
 
 export const metadata: Metadata = {
   title: "Aether Quant: readable, tested strategies for US stocks and commodities",
@@ -10,19 +12,11 @@ export const metadata: Metadata = {
     "Aether Quant turns market prices into readable trading rules, tests them hard, and runs the few that pass on your own Hyperliquid account. Your capital stays yours.",
 };
 
-const GATES: [string, string, string][] = [
-  ["Out-of-sample test", "Last 30% of history", "Held back during design"],
-  ["Risk-adjusted return", "Sharpe ≥ 0.5", "In both periods"],
-  ["Drawdown ceiling", "No worse than −35%", "Peak to trough, both periods"],
-  ["Evidence", "15+ trades", "No conclusions from a handful"],
-  ["Costs", "Fees charged on every fill", "Exchange fee plus ours"],
-];
-
 const CUSTODY = [
-  ["Your money stays with you", "Funds remain in your own Hyperliquid account. We never take deposits, so there is nothing to withdraw from us."],
-  ["Trade-only access", "You approve an agent key from your wallet. Hyperliquid lets it place orders, and never lets it withdraw or transfer funds."],
-  ["Protection at the exchange", "Every position has a stop-loss resting on Hyperliquid, so it stays in place even if our systems are offline."],
-  ["Stop at any time", "Pause a strategy, set daily-loss and drawdown limits, close everything with one switch, or revoke our key on Hyperliquid."],
+  ["Your money stays with you", "Funds remain in your own exchange account. We never take deposits, so there is nothing to withdraw from us."],
+  ["Trade-only access", "You approve an agent key from your wallet. It can place orders, and the exchange never lets it withdraw or transfer funds."],
+  ["Protection at the exchange", "Every position has a stop-loss resting on the exchange, so it stays in place even if our systems are offline."],
+  ["Stop at any time", "Pause a strategy, set daily-loss and drawdown limits, close everything with one switch, or revoke our key."],
 ] as const;
 
 const FAQ = [
@@ -44,7 +38,7 @@ function SectionHead({ id, kicker, title, children, dark }: { id: string; kicker
 }
 
 const Em = ({ children }: { children: React.ReactNode }) => (
-  <span className="font-[family-name:var(--aq-serif)] font-normal italic tracking-[-0.01em]">{children}</span>
+  <span className="font-[family-name:var(--aq-serif)] font-normal tracking-[-0.01em]">{children}</span>
 );
 
 export default function Landing() {
@@ -52,10 +46,7 @@ export default function Landing() {
     <Shell>
       {/* Hero */}
       <section className="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1240px] flex-col items-center justify-center px-4 pb-28 pt-16 text-center sm:px-8">
-        <p className="rounded-full border border-[#D5DDE0] bg-white px-4 py-1.5 text-[13px] text-[#3E4C58]">
-          US stocks and commodities · executes on Hyperliquid
-        </p>
-        <h1 className="mt-8 max-w-[16ch] text-[clamp(2.5rem,7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.045em]">
+        <h1 className="max-w-[16ch] text-[clamp(2.5rem,7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.045em]">
           From price data to a trade, <Em>in rules you can read.</Em>
         </h1>
         <p className="mt-8 max-w-[38rem] text-[1.1rem] leading-relaxed text-[#3E4C58] sm:text-[1.15rem]">
@@ -64,7 +55,7 @@ export default function Landing() {
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <a href="#how" className={pillDark}>See how it works</a>
-          <a href="#access" className={pillLine}>Get ready for launch</a>
+          <Link href="/dashboard" className={pillLine}>Go to dashboard</Link>
         </div>
         <a href="#how" className={`absolute bottom-8 flex flex-col items-center gap-2 text-[12.5px] text-[#5A6874] ${focus}`}>
           Scroll to follow one candle
@@ -77,7 +68,7 @@ export default function Landing() {
         <div className="mx-auto max-w-[1240px] px-4 pb-4 pt-14 text-center sm:px-8 sm:pt-16">
           <p className="font-[family-name:var(--aq-mono)] text-[12px] uppercase tracking-[0.16em] text-[#1E6B62]">How it works</p>
           <h2 id="how-h" className="mx-auto mt-3 max-w-[1000px] text-[clamp(2rem,4vw,3.5rem)] font-semibold leading-[1.03] tracking-[-0.045em] text-[#0C1A26]">
-            One candle, <span className="font-normal italic">all the way to an order.</span>
+            One candle, <span className="font-normal">all the way to an order.</span>
           </h2>
           <p className="mx-auto mt-3 max-w-[50rem] text-[clamp(0.95rem,1.1vw,1.05rem)] leading-relaxed text-[#5A6874]">
             Follow a single hour of NVIDIA&apos;s price as it becomes data, then a rule, then a trade on your account.
@@ -88,34 +79,19 @@ export default function Landing() {
 
       {/* Research standard */}
       <section id="standard" aria-labelledby="standard-h" className="scroll-mt-16 border-t border-[#E3E8EA] bg-white">
-        <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-14 px-4 py-28 sm:px-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <SectionHead id="standard-h" kicker="Research standard" title={<>A strategy has to <Em>earn its place.</Em></>}>
-            <p>
-              Most ideas fail our tests, and those never reach you. Every published strategy clears each requirement on
-              the period it was designed on and on a later period it never saw.
-            </p>
-            <p className="mt-4">Live strategies are compared with their tested behaviour and paused when they drift.</p>
-          </SectionHead>
-          <div className="min-w-0 overflow-x-auto rounded-3xl border border-[#E3E8EA]">
-            <table className="w-full min-w-[480px] text-left text-[15px]">
-              <caption className="sr-only">Requirements every published strategy must meet</caption>
-              <thead>
-                <tr className="border-b border-[#E3E8EA] text-[13px] text-[#5A6874]">
-                  <th scope="col" className="px-6 py-4 font-medium">Requirement</th>
-                  <th scope="col" className="px-6 py-4 font-medium">Threshold</th>
-                  <th scope="col" className="px-6 py-4 font-medium">Applies to</th>
-                </tr>
-              </thead>
-              <tbody>
-                {GATES.map(([r, t, a]) => (
-                  <tr key={r} className="border-b border-[#EEF2F3] last:border-0">
-                    <th scope="row" className="px-6 py-4 font-medium">{r}</th>
-                    <td className="px-6 py-4 font-[family-name:var(--aq-mono)] text-[14px] text-[#1E6B62]">{t}</td>
-                    <td className="px-6 py-4 text-[#5A6874]">{a}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="mx-auto flex max-w-[1240px] flex-col justify-center px-4 py-20 sm:px-8 lg:min-h-[calc(100svh-4rem)] lg:py-12">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1fr] lg:items-end lg:gap-16">
+            <SectionHead id="standard-h" kicker="Research standard" title={<>A strategy has to <Em>earn its place.</Em></>} />
+            <div className="max-w-2xl text-[1.05rem] leading-relaxed text-[#3E4C58]">
+              <p>
+                Most ideas fail our tests, and those never reach you. Every published strategy clears each requirement on
+                the period it was designed on and on a later period it never saw. Live strategies are compared with their
+                tested behaviour and paused when they drift.
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 lg:mt-10">
+            <GateFunnel />
           </div>
         </div>
       </section>
@@ -127,39 +103,28 @@ export default function Landing() {
         <SectionHead id="custody-h" kicker="Custody and control" title={<>Built so that <Em>you stay in control.</Em></>}>
           <p>We run the strategies. You keep the account, the funds and the final say.</p>
         </SectionHead>
-        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ol className="mt-14 grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {CUSTODY.map(([t, b], i) => (
-            <div key={t} className="rounded-3xl border border-[#E3E8EA] bg-white p-8">
-              <p className="font-[family-name:var(--aq-mono)] text-[12.5px] text-[#1E6B62]">{String(i + 1).padStart(2, "0")}</p>
-              <h3 className="mt-4 text-[1.15rem] font-semibold tracking-[-0.015em]">{t}</h3>
-              <p className="mt-2.5 text-[15.5px] leading-relaxed text-[#3E4C58]">{b}</p>
-            </div>
+            <li key={t} className="border-t-2 border-[#0C1A26] pt-5">
+              <span className="font-[family-name:var(--aq-mono)] text-[12.5px] text-[#1E6B62]">{String(i + 1).padStart(2, "0")}</span>
+              <h3 className="mt-3 text-[1.15rem] font-semibold tracking-[-0.015em]">{t}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-[#3E4C58]">{b}</p>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       {/* Pricing */}
       <section id="pricing" aria-labelledby="pricing-h" className="scroll-mt-16 border-y border-[#E3E8EA] bg-white">
-        <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-12 px-4 py-28 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-12 px-4 py-28 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16">
           <SectionHead id="pricing-h" kicker="Pricing" title={<>One small fee, <Em>only when we trade.</Em></>}>
             <p>
-              No subscription, no management fee and no performance fee. The fee is attached to each order through
-              Hyperliquid&apos;s builder code and collected by Hyperliquid when the trade settles.
+              No subscription, no management fee and no performance fee. We charge 0.03% of each order we place, attached
+              through Hyperliquid&apos;s builder code and collected when the trade settles.
             </p>
+            <ZeroFees />
           </SectionHead>
-          <dl className="grid grid-cols-1 divide-y divide-[#E3E8EA] rounded-3xl border border-[#E3E8EA] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {[
-              ["Per trade", "0.03%", "of each order we place"],
-              ["Fee ceiling", "0.05%", "capped by your own signature"],
-              ["Everything else", "$0", "subscription, management, performance"],
-            ].map(([k, v, d]) => (
-              <div key={k} className="p-7">
-                <dt className="text-[13px] text-[#5A6874]">{k}</dt>
-                <dd className="mt-2 text-[2.5rem] font-semibold leading-none tracking-[-0.04em]">{v}</dd>
-                <dd className="mt-2 text-[14px] text-[#5A6874]">{d}</dd>
-              </div>
-            ))}
-          </dl>
+          <FeeCalculator />
         </div>
       </section>
 
@@ -183,22 +148,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Access */}
-      <section id="access" aria-labelledby="access-h" className="mx-auto max-w-[1240px] scroll-mt-16 px-4 pb-28 sm:px-8">
-        <div className="rounded-[32px] bg-[#E3EEEC] px-6 py-16 text-center sm:px-12 sm:py-20">
-          <h2 id="access-h" className="mx-auto max-w-[18ch] text-[clamp(2rem,4.4vw,3.4rem)] font-semibold leading-[1.04] tracking-[-0.04em]">
-            Accounts open <Em>soon.</Em>
-          </h2>
-          <p className="mx-auto mt-5 max-w-[36rem] text-[1.075rem] leading-relaxed text-[#3E4C58]">
-            We are finishing validation of our first strategies. To be ready on day one, set up a wallet such as MetaMask
-            or OKX and fund a Hyperliquid account with USDC.
-          </p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <a href="https://app.hyperliquid.xyz" target="_blank" rel="noopener noreferrer" className={pillDark}>Open Hyperliquid</a>
-            <Link href="/legal/risk" className={pillLine}>Read the risk disclosure</Link>
-          </div>
-        </div>
-      </section>
     </Shell>
   );
 }

@@ -39,7 +39,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/#access" className={`${pillDark} !px-4 !py-2 !text-[14px]`}>Get notified</Link>
+            <Link href="/dashboard" className={`${pillDark} !px-4 !py-2 !text-[14px]`}>Dashboard</Link>
             <details className="relative lg:hidden">
               <summary className={`flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[#C9D2D7] [&::-webkit-details-marker]:hidden ${focus}`} aria-label="Menu">
                 <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden><path d="M2 5h14M2 9h14M2 13h14" stroke="#0C1A26" strokeWidth="1.6" /></svg>
@@ -77,8 +77,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <nav aria-label="Footer: legal">
               <h2 className="text-[13px] font-semibold text-white">Legal</h2>
               <ul className="mt-4 space-y-2.5 text-[14.5px]">
-                <li><Link href="/legal/terms" className="hover:text-white">Terms of use</Link></li>
-                <li><Link href="/legal/risk" className="hover:text-white">Risk disclosure</Link></li>
+                <li><Link href="/legal-terms" className="hover:text-white">Terms of use</Link></li>
+                <li><Link href="/legal-risk" className="hover:text-white">Risk disclosure</Link></li>
               </ul>
             </nav>
           </div>

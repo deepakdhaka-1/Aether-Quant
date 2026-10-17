@@ -29,7 +29,7 @@ export default function Learn() {
       <section className="mx-auto max-w-[880px] px-4 pb-24 pt-20 sm:px-8">
         <p className="text-sm font-medium text-[#1E6B62]">Glossary</p>
         <h1 className="mt-4 text-[clamp(2.2rem,5vw,3.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
-          The words, <span className="font-[family-name:var(--aq-serif)] font-normal italic">in plain English.</span>
+          The words, <span className="font-[family-name:var(--aq-serif)] font-normal">in plain English.</span>
         </h1>
         <p className="mt-5 max-w-[38rem] text-[1.075rem] leading-relaxed text-[#3E4C58]">
           Everything on this site in one or two sentences each. No prior trading knowledge needed.
