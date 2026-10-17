@@ -62,7 +62,7 @@ export function RiskForm({ initial }: { initial: Risk }) {
           <span className="block text-sm text-mist-100">Trading enabled</span>
           <span className="block text-xs text-mist-400">Turn off to pause all new live and paper orders across your accounts.</span>
         </span>
-        <input type="checkbox" role="switch" checked={r.trading_enabled} onChange={(e) => setR({ ...r, trading_enabled: e.target.checked })} className="h-5 w-5 accent-[#7cf5d4]" />
+        <input type="checkbox" role="switch" checked={r.trading_enabled} onChange={(e) => setR({ ...r, trading_enabled: e.target.checked })} className="h-5 w-5 accent-[#1E6B62]" />
       </label>
       {FIELDS.map((f) => (
         <div key={f.key}>

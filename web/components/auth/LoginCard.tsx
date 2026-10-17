@@ -70,7 +70,7 @@ export function LoginCard({ next, referral, initialError, initialMode = "signin"
         },
       });
       if (authError) throw authError;
-      if (data.session) go();
+      if (data.session && data.user?.email_confirmed_at) go();
       else {
         setSignupPending(true);
         setNote(`We sent a confirmation link and 6-digit code to ${email}. Confirm using either one.`);

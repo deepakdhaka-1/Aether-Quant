@@ -44,7 +44,7 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
               aria-current={on ? "page" : undefined}
               className={cx(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
-                on ? "bg-ink-800 text-mist-100 shadow-[inset_2px_0_0_#7cf5d4]" : "text-mist-400 hover:bg-ink-900 hover:text-mist-100",
+                on ? "bg-ink-800 text-mist-100 shadow-[inset_2px_0_0_#1E6B62]" : "text-mist-400 hover:bg-ink-900 hover:text-mist-100",
               )}
             >
               <Icon className={cx("h-4 w-4", on && "text-aether")} aria-hidden />

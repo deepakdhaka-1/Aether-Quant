@@ -100,7 +100,7 @@ export function TotpSettings() {
 
   return (
     <div className="space-y-4 p-5">
-      <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#7cf5d4]" /><div><p className="text-sm font-medium text-mist-100">Authenticator app</p><p className="mt-1 text-xs leading-relaxed text-mist-400">Add one or more time-based codes. You&apos;ll enter a code after signing in with your password or email link.</p></div></div>
+      <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#1E6B62]" /><div><p className="text-sm font-medium text-mist-100">Authenticator app</p><p className="mt-1 text-xs leading-relaxed text-mist-400">Add one or more time-based codes. You&apos;ll enter a code after signing in with your password or email link.</p></div></div>
       {message && <Banner tone={message.ok ? "info" : "bad"}>{message.text}</Banner>}
       {loading ? <div className="flex items-center gap-2 text-sm text-mist-400"><Loader2 className="h-4 w-4 animate-spin" />Loading verification settings…</div> : <>
         {factors.map((factor) => <div key={factor.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-700 p-3.5"><div><p className="text-sm text-mist-100">{factor.friendly_name || "Authenticator app"}</p><p className="mt-1 text-xs text-mist-400">Enabled for sign-in verification.</p></div><button type="button" className={btn.ghost} onClick={() => removeFactor(factor)} disabled={busy}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}Remove</button></div>)}

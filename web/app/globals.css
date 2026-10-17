@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   /* Keep every site's legacy font hook on the same Inter family. */
   --font-mono: var(--font-sans);
   --aq-sans: var(--font-sans);
@@ -13,8 +13,8 @@
 
 html,
 body {
-  background: #05080d;
-  color: #e8eef6;
+  background: #F5F7F7;
+  color: #0C1A26;
 }
 
 body {
@@ -84,5 +84,5 @@ html {
   #market-stage *, #market-stage *::before { animation: none !important; scroll-behavior: auto !important; }
 }
 
-input[type="range"] { accent-color: #7cf5d4; }
+input[type="range"] { accent-color: #1E6B62; }
 

@@ -37,7 +37,7 @@ export function Badge({ children, tone = "default" }: { children: ReactNode; ton
     good: "border-aether/40 text-aether bg-aether/5",
     bad: "border-loss/40 text-loss bg-loss/5",
     warn: "border-warn/40 text-warn bg-warn/5",
-    accent: "border-aether/60 text-ink-950 bg-aether",
+    accent: "border-aether/60 text-white bg-aether",
   }[tone];
   return (
     <span className={cx("inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider", t)}>

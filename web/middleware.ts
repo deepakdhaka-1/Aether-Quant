@@ -31,6 +31,15 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
   if (data.user && isProtected(path)) {
+    // A session is not sufficient for app access until the email address is confirmed.
+    if (!data.user.email_confirmed_at) {
+      if (path.startsWith("/api/")) return NextResponse.json({ error: "Email confirmation required", code: "email_not_confirmed" }, { status: 403 });
+      const url = req.nextUrl.clone();
+      url.pathname = "/verify-email";
+      url.search = "";
+      url.searchParams.set("next", `${path}${req.nextUrl.search}`);
+      return NextResponse.redirect(url);
+    }
     const { data: aal, error } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
     if (error || !aal) return new NextResponse("Could not verify session assurance. Please retry.", { status: 503 });
     if (aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {

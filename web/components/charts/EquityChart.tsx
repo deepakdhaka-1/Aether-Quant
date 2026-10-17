@@ -45,7 +45,7 @@ export function EquityChart({ data, label = "Backtest equity" }: { data: EquityP
       </div>
     );
 
-  const color = g.up ? "#7cf5d4" : "#ff6b81";
+  const color = g.up ? "#1E6B62" : "#C74747";
 
   const onMove = (e: PointerEvent<SVGSVGElement>) => {
     const r = ref.current?.getBoundingClientRect();
@@ -84,8 +84,8 @@ export function EquityChart({ data, label = "Backtest equity" }: { data: EquityP
         </defs>
         {g.yTicks.map((t) => (
           <g key={t}>
-            <line x1={PAD.l} x2={W - PAD.r} y1={g.sy(t)} y2={g.sy(t)} stroke="#1d2a3d" strokeDasharray="2 4" />
-            <text x={W - PAD.r + 8} y={g.sy(t) + 4} fill="#5f6f86" fontSize="11" fontFamily="var(--font-mono)">{fmtY(t)}</text>
+            <line x1={PAD.l} x2={W - PAD.r} y1={g.sy(t)} y2={g.sy(t)} stroke="#E3E8EA" strokeDasharray="2 4" />
+            <text x={W - PAD.r + 8} y={g.sy(t) + 4} fill="#7A8790" fontSize="11" fontFamily="var(--font-mono)">{fmtY(t)}</text>
           </g>
         ))}
         {g.xTicks.map((t, i) => (
@@ -93,7 +93,7 @@ export function EquityChart({ data, label = "Backtest equity" }: { data: EquityP
             key={t}
             x={g.sx(t)}
             y={H - 8}
-            fill="#5f6f86"
+            fill="#7A8790"
             fontSize="11"
             fontFamily="var(--font-mono)"
             textAnchor={i === 0 ? "start" : i === 3 ? "end" : "middle"}
@@ -101,13 +101,13 @@ export function EquityChart({ data, label = "Backtest equity" }: { data: EquityP
             {fmtX(t)}
           </text>
         ))}
-        <line x1={PAD.l} x2={W - PAD.r} y1={g.sy(start)} y2={g.sy(start)} stroke="#2a3b54" />
+        <line x1={PAD.l} x2={W - PAD.r} y1={g.sy(start)} y2={g.sy(start)} stroke="#C9D2D7" />
         <path d={g.area} fill="url(#eq-fill)" />
         <path d={g.line} fill="none" stroke={color} strokeWidth="1.8" className="animate-draw" />
         {p && (
           <g pointerEvents="none">
-            <line x1={px} x2={px} y1={PAD.t} y2={PAD.t + g.ih} stroke="#8291a7" strokeDasharray="3 3" />
-            <circle cx={px} cy={py} r="4.5" fill="#05080d" stroke={color} strokeWidth="2" />
+            <line x1={px} x2={px} y1={PAD.t} y2={PAD.t + g.ih} stroke="#7A8790" strokeDasharray="3 3" />
+            <circle cx={px} cy={py} r="4.5" fill="#FFFFFF" stroke={color} strokeWidth="2" />
           </g>
         )}
       </svg>

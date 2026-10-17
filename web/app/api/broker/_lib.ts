@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { HL_API, HL_APP, hlInfo, feeRateToBps10, type Network } from "@/lib/hyperliquid";
 import { requireUser, supabaseAdmin } from "@/lib/supabase/server";
 
-export const BUILDER_ADDRESS = (process.env.NEXT_PUBLIC_BUILDER_ADDRESS ?? "").toLowerCase();
+const configuredBuilderAddress =
+  process.env.NEXT_PUBLIC_BUILDER_ADDRESS?.trim() ||
+  process.env.BUILDER_ADDRESS?.trim() ||
+  "0x42A8B8e6f960D399DeB81c5C103b6313f828d06F";
+export const BUILDER_ADDRESS = configuredBuilderAddress.toLowerCase();
 export const BUILDER_MAX_FEE = process.env.NEXT_PUBLIC_BUILDER_MAX_FEE ?? "0.05%";
 
 export const json = (body: unknown, status = 200) => NextResponse.json(body, { status });
