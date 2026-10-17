@@ -98,6 +98,7 @@ export type Database = {
         Row: {
           agent_address: string
           agent_approved: boolean
+          agent_key_format: string
           agent_secret_enc: string
           broker: string
           builder_approved: boolean
@@ -117,6 +118,7 @@ export type Database = {
         Insert: {
           agent_address: string
           agent_approved?: boolean
+          agent_key_format?: string
           agent_secret_enc: string
           broker?: string
           builder_approved?: boolean
@@ -136,6 +138,7 @@ export type Database = {
         Update: {
           agent_address?: string
           agent_approved?: boolean
+          agent_key_format?: string
           agent_secret_enc?: string
           broker?: string
           builder_approved?: boolean

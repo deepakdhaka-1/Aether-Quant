@@ -28,7 +28,7 @@
 set -euo pipefail
 
 # Load shared local configuration when present. Quote values containing shell metacharacters
-# in .env so the file is safe to source.
+# in .env. Explicitly exported environment values take precedence only if .env omits the key.
 if [[ -f .env ]]; then
   set -a
   # shellcheck disable=SC1091

@@ -1,5 +1,4 @@
 import { HL_APP } from "@/lib/hyperliquid";
-import { supabaseAdmin } from "@/lib/supabase/server";
 import { json, ownedAccount } from "../_lib";
 
 export const runtime = "nodejs";
@@ -11,7 +10,7 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { broker_account_id?: string };
   const r = await ownedAccount(body.broker_account_id);
   if ("error" in r) return r.error;
-  const sb = supabaseAdmin();
+  const { sb } = r;
   const { error } = await sb
     .from("broker_accounts")
     .update({ status: "revoked", kill_switch: true, updated_at: new Date().toISOString() })

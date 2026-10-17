@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const r = await ownedAccount(body.broker_account_id);
   if ("error" in r) return r.error;
   try {
-    return json(await verifyOnChain(r.row));
+    return json(await verifyOnChain(r.sb, r.row));
   } catch (e) {
     return json({ error: friendlyError(String((e as Error).message), r.row.network) }, 502);
   }

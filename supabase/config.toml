@@ -14,10 +14,15 @@ project_id = "slkrvhpvflfweoetxfki"
 
 # The GitHub integration deploys only functions declared here.
 [functions.execute]
+verify_jwt = false
 [functions.fees]
+verify_jwt = false
 [functions.ingest]
+verify_jwt = false
 [functions.monitor]
+verify_jwt = false
 [functions.signals]
+verify_jwt = false
 
 # Keep the public logos versioned with the app and sync them to Storage on deploy.
 [storage.buckets.asset-icons]

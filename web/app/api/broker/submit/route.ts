@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { broker_account_id?: string; action?: Record<string, unknown>; signature?: string };
   const r = await ownedAccount(body.broker_account_id);
   if ("error" in r) return r.error;
-  const { row } = r;
+  const { row, sb } = r;
   if (row.status === "revoked") return json({ error: "This connection was revoked. Connect again to create a new one." }, 409);
   if (!body.action || typeof body.action !== "object") return json({ error: "action required" }, 400);
   if (typeof body.signature !== "string" || !isHex(body.signature)) return json({ error: "signature required" }, 400);
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     relayError = "Could not reach Hyperliquid. Please try again.";
   }
   try {
-    const state = await verifyOnChain(row, relayError);
+    const state = await verifyOnChain(sb, row, relayError);
     return json({ ...state, error: relayError ?? undefined }, relayError ? 400 : 200);
   } catch {
     return json({ error: relayError ?? "Submitted, but could not confirm on Hyperliquid yet. Press refresh." }, 502);

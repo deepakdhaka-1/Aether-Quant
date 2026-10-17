@@ -1,7 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { HL_API, HL_APP, hlInfo, feeRateToBps10, type Network } from "@/lib/hyperliquid";
-import { requireUser, supabaseAdmin } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/server";
 
 const configuredBuilderAddress =
   process.env.NEXT_PUBLIC_BUILDER_ADDRESS?.trim() ||
@@ -19,6 +19,7 @@ export type BrokerRow = {
   network: Network;
   wallet_address: string;
   agent_address: string;
+  agent_key_format: string;
   agent_approved: boolean;
   builder_approved: boolean;
   builder_max_fee: string | null;
@@ -27,22 +28,22 @@ export type BrokerRow = {
 };
 
 const COLS =
-  "id,user_id,network,wallet_address,agent_address,agent_approved,builder_approved,builder_max_fee,status,kill_switch";
+  "id,user_id,network,wallet_address,agent_address,agent_key_format,agent_approved,builder_approved,builder_max_fee,status,kill_switch";
 
 /** Signed-in user + the broker row they own, or an error response. Never selects the agent secret. */
-export async function ownedAccount(id: unknown): Promise<{ row: BrokerRow; userId: string } | { error: NextResponse }> {
-  const { user } = await requireUser();
+export async function ownedAccount(id: unknown): Promise<{ row: BrokerRow; userId: string; sb: Awaited<ReturnType<typeof requireUser>>["sb"] } | { error: NextResponse }> {
+  const { user, sb } = await requireUser();
   if (!user) return { error: json({ error: "sign in first" }, 401) };
   if (typeof id !== "string" || !id) return { error: json({ error: "broker_account_id required" }, 400) };
-  const { data } = await supabaseAdmin().from("broker_accounts").select(COLS).eq("id", id).maybeSingle();
+  const { data } = await sb.from("broker_accounts").select(COLS).eq("id", id).maybeSingle();
   if (!data || data.user_id !== user.id) return { error: json({ error: "broker account not found" }, 404) };
-  return { row: data as BrokerRow, userId: user.id };
+  return { row: data as BrokerRow, userId: user.id, sb };
 }
 
 type ExtraAgent = { name?: string; address: string; validUntil?: number };
 
 /** Ask Hyperliquid what is actually approved, then persist it. Source of truth is the venue. */
-export async function verifyOnChain(row: BrokerRow, lastError: string | null = null) {
+export async function verifyOnChain(sb: Awaited<ReturnType<typeof requireUser>>["sb"], row: BrokerRow, lastError: string | null = null) {
   const [agents, maxFee] = await Promise.all([
     hlInfo<ExtraAgent[]>(row.network, { type: "extraAgents", user: row.wallet_address }),
     BUILDER_ADDRESS
@@ -54,16 +55,18 @@ export async function verifyOnChain(row: BrokerRow, lastError: string | null = n
   const agentApproved = !!agent && (!agent.validUntil || agent.validUntil > now);
   // Approved rate must cover what the engine actually charges (BUILDER_FEE_BPS10 <= configured max).
   const builderApproved = Number(maxFee ?? 0) >= feeRateToBps10(BUILDER_MAX_FEE);
-  const bothOk = agentApproved && builderApproved;
   const update = {
     agent_approved: agentApproved,
     builder_approved: builderApproved,
     builder_max_fee: Number(maxFee) > 0 ? `${Number(maxFee) / 1000}%` : null,
-    status: row.status === "revoked" ? "revoked" : bothOk ? "active" : lastError ? "error" : "pending",
+    // The current executor only understands v1 AES envelopes. Keep browser RSA
+    // envelopes pending until trusted executor support is deployed.
+    status: row.status === "revoked" ? "revoked" : row.agent_key_format === "rsa1" ? "pending" : row.status,
     last_error: lastError,
     updated_at: new Date().toISOString(),
   };
-  await supabaseAdmin().from("broker_accounts").update(update).eq("id", row.id);
+  const { status: _status, ...userWritableUpdate } = update;
+  await sb.from("broker_accounts").update(userWritableUpdate).eq("id", row.id);
   return { ...update, agent_valid_until: agent?.validUntil ?? null };
 }
 

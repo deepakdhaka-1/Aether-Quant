@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,9 +16,9 @@ const NEXT: Record<string, string[]> = {
 };
 
 export async function GET() {
-  const { isAdmin } = await requireAdmin();
+  const { isAdmin, sb } = await requireAdmin();
   if (!isAdmin) return NextResponse.json({ error: "not found" }, { status: 404 });
-  const { data, error } = await supabaseAdmin()
+  const { data, error } = await sb
     .from("strategies")
     .select("id,slug,name,description,symbol,timeframe,direction,risk_level,status,source,model_name,headline_metrics,generation_meta,default_leverage,stop_loss_pct,take_profit_pct,entry_long,exit_long,entry_short,exit_short,created_at,published_at")
     .order("created_at", { ascending: false });
@@ -27,11 +27,10 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  const { isAdmin } = await requireAdmin();
+  const { isAdmin, sb } = await requireAdmin();
   if (!isAdmin) return NextResponse.json({ error: "not found" }, { status: 404 });
   const body = (await req.json().catch(() => ({}))) as { id?: string; status?: string; description?: string; risk_level?: string };
   if (!body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
-  const sb = supabaseAdmin();
   const { data: cur } = await sb.from("strategies").select("status").eq("id", body.id).maybeSingle();
   if (!cur) return NextResponse.json({ error: "strategy not found" }, { status: 404 });
 

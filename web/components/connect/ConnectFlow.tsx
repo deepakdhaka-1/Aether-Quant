@@ -2,12 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { ArrowUpRight, Check, Loader2, PenLine, ShieldCheck } from "lucide-react";
 import { WalletPicker, WalletIcon } from "@/components/wallet/WalletPicker";
 import { Banner, btn, cx } from "@/components/ui";
 import { connect, signTypedData, walletError, type DiscoveredWallet } from "@/lib/wallets";
 import { HL_APP, approveAgentAction, approveBuilderFeeAction, typedData, type Network } from "@/lib/hyperliquid";
 import { short } from "@/lib/format";
+import { encryptAgentKey } from "@/lib/agent-crypto";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 const NETWORK: Network = process.env.NEXT_PUBLIC_HL_NETWORK === "testnet" ? "testnet" : "mainnet";
 const DEFAULT_FEE = process.env.NEXT_PUBLIC_BUILDER_MAX_FEE ?? "0.05%";
@@ -57,18 +60,55 @@ export function ConnectFlow() {
     setStep(2);
     setError(null);
     setBusy("prepare");
-    const r = await post<Prepared>("/api/broker/prepare", {
-      wallet_address: address,
-      wallet_provider: w.info.name.toLowerCase().replace(/\s+wallet$/, ""),
-      network: NETWORK,
-    });
-    if (r.error) {
-      if (r._status === 409) return fail("This wallet is already connected to another Aether Quant account. Sign in with that account, or use a different wallet.");
-      return fail(r.error);
+    try {
+      const sb = supabaseBrowser();
+      const { data: auth } = await sb.auth.getUser();
+      if (!auth.user) return fail("Your session expired. Sign in again and retry.");
+
+      const { data: existing } = await sb
+        .from("broker_accounts")
+        .select("id")
+        .eq("wallet_address", address.toLowerCase())
+        .eq("network", NETWORK)
+        .maybeSingle();
+      if (existing) return fail("This wallet already has a saved connection. Revoke it before creating a replacement.");
+
+      // Create in this browser, encrypt to the executor's public key, and send only ciphertext.
+      const agentKey = generatePrivateKey();
+      const agent = privateKeyToAccount(agentKey);
+      if (agent.address.toLowerCase() === address.toLowerCase()) return fail("Agent key collision. Please retry.");
+      const agentSecretEnc = await encryptAgentKey(agentKey);
+      const { data, error: insertError } = await sb
+        .from("broker_accounts")
+        .insert({
+          user_id: auth.user.id,
+          broker: "hyperliquid",
+          network: NETWORK,
+          wallet_address: address.toLowerCase(),
+          wallet_provider: w.info.name.toLowerCase().replace(/\s+wallet$/, ""),
+          agent_address: agent.address.toLowerCase(),
+          agent_secret_enc: agentSecretEnc,
+          agent_key_format: "rsa1",
+        })
+        .select("id")
+        .single();
+      if (insertError || !data) {
+        if (insertError?.code === "23505") return fail("This wallet already has a saved connection. Revoke it before creating a replacement.");
+        return fail(insertError?.message ?? "Could not save your encrypted agent key.");
+      }
+
+      setPrep({
+        broker_account_id: data.id,
+        agent_address: agent.address.toLowerCase(),
+        builder_address: process.env.NEXT_PUBLIC_BUILDER_ADDRESS ?? "0x42A8B8e6f960D399DeB81c5C103b6313f828d06F",
+        max_fee_rate: DEFAULT_FEE,
+        network: NETWORK,
+      });
+      setBusy(null);
+      setStep(3);
+    } catch (e) {
+      fail(e instanceof Error ? e.message : "Could not create the encrypted agent key.");
     }
-    setPrep(r);
-    setBusy(null);
-    setStep(3);
   };
 
   const chainId = async (w: DiscoveredWallet) => parseInt((await w.provider.request({ method: "eth_chainId" })) as string, 16);
@@ -190,7 +230,7 @@ export function ConnectFlow() {
           <div className="space-y-3">
             <h3 className="text-base font-semibold">Creating your agent wallet</h3>
             {busy === "prepare" ? (
-              <p className="flex items-center gap-2 text-sm text-mist-300"><Loader2 className="h-4 w-4 animate-spin text-aether" /> Generating a dedicated trading key on our server…</p>
+              <p className="flex items-center gap-2 text-sm text-mist-300"><Loader2 className="h-4 w-4 animate-spin text-aether" /> Generating and encrypting your trading key in this browser…</p>
             ) : (
               <button type="button" className={btn.primary} onClick={() => prepare()}>Try again</button>
             )}
@@ -223,8 +263,8 @@ export function ConnectFlow() {
             <div className="flex items-center gap-3 rounded-xl border border-aether/40 bg-aether/[0.06] p-4">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-aether text-ink-950"><Check className="h-5 w-5" aria-hidden /></span>
               <div>
-                <div className="font-semibold">Hyperliquid connected</div>
-                <div className="text-xs text-mist-400">Your account is active. Pick strategies to follow, in paper or live mode.</div>
+                <div className="font-semibold">Hyperliquid approvals saved</div>
+                <div className="text-xs text-mist-400">Your encrypted agent key and approvals are saved. Live execution stays pending until the executor supports this key format.</div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
