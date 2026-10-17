@@ -234,9 +234,7 @@ export default function GateFunnel() {
             <span className={`${mono} shrink-0 text-[13px] text-[#1E6B62]`}>{g.threshold}</span>
             <span className="leading-snug text-[#3E4C58]">{g.body}</span>
           </>
-        ) : (
-          <span className="text-[13px] text-[#5A6874]">Hover or focus a wall to see what it checks.</span>
-        )}
+        ) : null}
       </div>
     </div>
   );

@@ -34,11 +34,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="text-[17px] font-semibold tracking-[-0.02em]">Aether Quant</span>
           </Link>
           <nav aria-label="Primary" className="hidden items-center gap-7 text-[14px] text-[#3E4C58] lg:flex">
-            {NAV.map(([l, h]) => (
+            {NAV.slice(0, 4).map(([l, h]) => (
               <Link key={h} href={h} className={`transition-colors hover:text-[#0C1A26] ${focus}`}>{l}</Link>
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <nav aria-label="Resources" className="hidden items-center gap-5 text-[14px] text-[#3E4C58] lg:flex">
+              {NAV.slice(4).map(([l, h]) => (
+                <Link key={h} href={h} className={`transition-colors hover:text-[#0C1A26] ${focus}`}>{l}</Link>
+              ))}
+            </nav>
             <Link href="/dashboard" className={`${pillDark} !px-4 !py-2 !text-[14px]`}>Dashboard</Link>
             <details className="relative lg:hidden">
               <summary className={`flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[#C9D2D7] [&::-webkit-details-marker]:hidden ${focus}`} aria-label="Menu">
@@ -56,7 +61,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <main id="main">{children}</main>
       <footer className="bg-[#0C1A26] text-[#B4C4CF]">
         <div className="mx-auto max-w-[1240px] px-4 py-16 sm:px-8">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
             <div>
               <p className="text-[18px] font-semibold tracking-[-0.02em] text-white">Aether Quant</p>
               <p className="mt-3 max-w-[34ch] text-[14.5px] leading-relaxed">
@@ -71,7 +76,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <nav aria-label="Footer: product">
               <h2 className="text-[13px] font-semibold text-white">Product</h2>
               <ul className="mt-4 space-y-2.5 text-[14.5px]">
-                {NAV.map(([l, h]) => <li key={h}><Link href={h} className="hover:text-white">{l}</Link></li>)}
+                {NAV.slice(0, 4).map(([l, h]) => <li key={h}><Link href={h} className="hover:text-white">{l}</Link></li>)}
+              </ul>
+            </nav>
+            <nav aria-label="Footer: resources">
+              <h2 className="text-[13px] font-semibold text-white">Resources</h2>
+              <ul className="mt-4 space-y-2.5 text-[14.5px]">
+                {NAV.slice(4).map(([l, h]) => <li key={h}><Link href={h} className="hover:text-white">{l}</Link></li>)}
               </ul>
             </nav>
             <nav aria-label="Footer: legal">
