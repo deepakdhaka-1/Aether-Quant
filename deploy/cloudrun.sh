@@ -27,6 +27,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
+# Load shared local configuration when present. Quote values containing shell metacharacters
+# in .env so the file is safe to source.
+if [[ -f .env ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
+fi
+
 PROJECT="${PROJECT:?set PROJECT=<gcp-project-id>}"
 REGION="${REGION:-us-central1}"
 REPO="${REPO:-aether}"
@@ -88,7 +97,7 @@ gcloud builds submit "$CTX" --project "$PROJECT" --tag "$IMAGE"
 ENV_VARS="^@^SUPABASE_URL=$SUPABASE_URL@HIP3_DEX=$HIP3_DEX@BUILDER_ADDRESS=$BUILDER_ADDRESS@BUILDER_FEE_BPS10=$BUILDER_FEE_BPS10"
 ENV_VARS+="@DRY_RUN=$DRY_RUN@HYPERLIQUID_LIVE_CONFIRMED=$LIVE_CONFIRMED@TELEGRAM_CHAT_IDS=$TELEGRAM_CHAT_IDS"
 ENV_VARS+="@MONITOR_ENV_LABEL=$MONITOR_ENV_LABEL@MONITOR_WEBHOOK_URL=$MONITOR_WEBHOOK_URL@MONITOR_PING_URL=$MONITOR_PING_URL"
-SECRETS="SUPABASE_SERVICE_ROLE_KEY=aether-supabase-service-key:latest,AETHER_ENCRYPTION_KEY=aether-encryption-key:latest"
+SECRETS="SUPABASE_SERVICE_ROLE_KEY=aether-supabase-service-key:latest,API_ENCRYPTION_KEY=aether-encryption-key:latest"
 SECRETS+=",TELEGRAM_BOT_TOKEN=aether-telegram-bot-token:latest,ENGINE_API_TOKEN=aether-engine-api-token:latest"
 
 # ── 4. jobs + schedules ─────────────────────────────────────────────────────

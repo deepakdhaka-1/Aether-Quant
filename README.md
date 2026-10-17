@@ -37,10 +37,10 @@ agent key that can place orders but can never withdraw. Revenue is a Hyperliquid
 ## Run locally
 
 ```bash
-# website  (port 3001; needs web/.env.local)
+# website (port 3001; reads the repository-root .env)
 cd web && npm install && npx next dev -p 3001
 
-# research engine (needs engine/.env)
+# research engine (reads the repository-root .env)
 cd engine && python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
 .venv/Scripts/python -m pytest tests                     # 112 tests
 .venv/Scripts/python -m aether.cli ingest NVDA 1h        # fill indicator tables
@@ -48,7 +48,7 @@ cd engine && python -m venv .venv && .venv/Scripts/python -m pip install -r requ
 .venv/Scripts/python -m uvicorn aether.api:app --port 8000   # optional research API
 ```
 
-`.env` files are git-ignored. Templates: `web/.env.example`, `engine/.env.example`.
+Copy `.env.example` to the repository root as `.env` and configure it once for local web and engine use. Keep it private; it is git-ignored. Production providers such as Hostinger and Supabase still require their own environment secrets to be configured separately.
 
 ## Safety defaults
 

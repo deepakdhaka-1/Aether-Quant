@@ -4,8 +4,9 @@ import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 // AES-256-GCM envelope shared with engine/aether/crypto.py: "v1.<iv>.<ct>.<tag>" (base64url).
 
 function key(): Buffer {
-  const k = Buffer.from(process.env.AETHER_ENCRYPTION_KEY ?? "", "base64");
-  if (k.length !== 32) throw new Error("AETHER_ENCRYPTION_KEY must be 32 bytes, base64-encoded");
+  const raw = process.env.API_ENCRYPTION_KEY || process.env.AETHER_ENCRYPTION_KEY || "";
+  const k = Buffer.from(raw, "base64");
+  if (k.length !== 32) throw new Error("API_ENCRYPTION_KEY must be 32 bytes, base64-encoded");
   return k;
 }
 

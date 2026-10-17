@@ -20,7 +20,7 @@ def _b64e(b: bytes) -> str:
 def _key() -> bytes:
     key = base64.b64decode(config.ENCRYPTION_KEY or "")
     if len(key) != 32:
-        raise RuntimeError("AETHER_ENCRYPTION_KEY must be 32 bytes, base64-encoded")
+        raise RuntimeError("API_ENCRYPTION_KEY must be 32 bytes, base64-encoded")
     return key
 
 

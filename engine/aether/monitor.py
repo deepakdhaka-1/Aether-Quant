@@ -17,7 +17,7 @@ Design
 * The monitor never trades and never writes to trading tables. It must never crash silently:
   a failing check becomes a 'monitor_check_failed' finding.
 
-Env (all optional, see engine/.env.monitor.example):
+Env (all optional, see root .env):
   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_IDS (comma list), MONITOR_WEBHOOK_URL, MONITOR_PING_URL,
   MONITOR_ALERT_COOLDOWN_S (default 1800), MONITOR_ENV_LABEL (prefix on alerts, e.g. "prod").
 """

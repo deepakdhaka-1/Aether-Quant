@@ -1,9 +1,10 @@
-"""All engine configuration comes from the environment (see engine/.env.example)."""
+"""All engine configuration comes from the environment (see .env.example)."""
 import os
+from pathlib import Path
 
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
 except ImportError:
     pass
 
@@ -22,8 +23,8 @@ SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 COINGLASS_BASE_URL = os.getenv("COINGLASS_BASE_URL", "https://fapi.coinglass.com")
 COINGLASS_API_KEY = os.getenv("COINGLASS_API_KEY", "")   # optional; the kline endpoint is keyless today
 
-# 32-byte key, base64. MUST equal web's AETHER_ENCRYPTION_KEY.
-ENCRYPTION_KEY = os.getenv("AETHER_ENCRYPTION_KEY", "")
+# 32-byte key, base64. Must match API_ENCRYPTION_KEY on the web and executor.
+ENCRYPTION_KEY = os.getenv("API_ENCRYPTION_KEY") or os.getenv("AETHER_ENCRYPTION_KEY", "")
 
 HYPERLIQUID_API_URL = os.getenv("HYPERLIQUID_API_URL", "https://api.hyperliquid.xyz")
 HIP3_DEX = os.getenv("HIP3_DEX", "xyz")

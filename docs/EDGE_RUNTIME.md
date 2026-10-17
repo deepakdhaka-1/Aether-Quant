@@ -42,7 +42,7 @@ Hyperliquid Python SDK.
 
 | Secret | Purpose |
 |---|---|
-| `AETHER_ENCRYPTION_KEY` | Decrypts users' agent keys. Must equal `web/.env.local` |
+| `API_ENCRYPTION_KEY` | Decrypts users' agent keys. Same 32-byte base64 value as the web app. Keep it outside the database. |
 | `CRON_SECRET` | Must equal Vault `aether_cron_secret` |
 | `DRY_RUN` | `true` = record intended orders only (**default**) |
 | `HYPERLIQUID_LIVE_CONFIRMED` | Second live gate, default `false` |

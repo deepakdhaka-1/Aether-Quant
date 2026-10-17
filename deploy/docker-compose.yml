@@ -1,7 +1,7 @@
 # Single-VM deploy: engine API + a cron sidecar that runs the executor / signals / monitor / fees passes.
 #
-#   cp engine/.env.example deploy/.env      # fill in; append engine/.env.monitor.example values
-#   chmod 600 deploy/.env
+#   cp .env.example .env                    # fill in once at the repository root
+#   chmod 600 .env
 #   docker compose -f deploy/docker-compose.yml up -d --build
 #
 # Secrets come from deploy/.env at RUNTIME (env_file), never baked into the image.
@@ -14,7 +14,7 @@ x-engine: &engine
     context: ../engine
     dockerfile: ../deploy/engine.Dockerfile
   image: aether-engine:local
-  env_file: .env
+  env_file: ../.env
   restart: unless-stopped
   read_only: true
   tmpfs: [/tmp]

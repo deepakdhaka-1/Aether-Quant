@@ -19,22 +19,26 @@ export async function POST(req: Request) {
   if (!BUILDER_ADDRESS) return json({ error: "builder address not configured" }, 500);
   const wallet = body.wallet_address.toLowerCase();
 
+  // Generate and encrypt before any database call. The plaintext key stays in this
+  // server process and is never sent to Supabase, the browser, or the API response.
+  const key = generatePrivateKey();
+  const agent = privateKeyToAccount(key);
+  if (agent.address.toLowerCase() === wallet) return json({ error: "agent collision, retry" }, 500);
+  const agentSecretEnc = encrypt(key);
+
   const sb = supabaseAdmin();
   const { data: existing } = await sb
     .from("broker_accounts").select("id,user_id").eq("wallet_address", wallet).eq("network", network).maybeSingle();
   if (existing && existing.user_id !== user.id)
     return json({ error: "This wallet is already connected to another Aether Quant account." }, 409);
 
-  const key = generatePrivateKey();
-  const agent = privateKeyToAccount(key);
-  if (agent.address.toLowerCase() === wallet) return json({ error: "agent collision, retry" }, 500);
   const row = {
     user_id: user.id,
     network,
     wallet_address: wallet,
     wallet_provider: body.wallet_provider?.slice(0, 40) ?? null,
     agent_address: agent.address.toLowerCase(),
-    agent_secret_enc: encrypt(key),
+    agent_secret_enc: agentSecretEnc,
     // A new agent needs fresh approvals; reset state (builder approval is re-verified on submit).
     agent_approved: false,
     builder_approved: false,

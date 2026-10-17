@@ -45,13 +45,13 @@ It contains no secrets.
 | Var | Where | Notes |
 |---|---|---|
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | engine | service role: server only, Secret Manager `aether-supabase-service-key` |
-| `AETHER_ENCRYPTION_KEY` | engine + web | 32 bytes base64, must be the SAME in both. Secret `aether-encryption-key` |
+| `API_ENCRYPTION_KEY` | engine + web + Supabase executor | 32 bytes base64, same value in all runtimes. Secret `aether-encryption-key` |
 | `ENGINE_API_TOKEN` | engine + web | bearer for the engine API. Secret `aether-engine-api-token` |
 | `BUILDER_ADDRESS`, `BUILDER_FEE_BPS10` | engine (+ `NEXT_PUBLIC_BUILDER_*` web) | revenue wallet and fee (30 = 0.03 %) |
 | `HIP3_DEX`, `HYPERLIQUID_API_URL`, `HYPERLIQUID_SLIPPAGE` | engine | venue |
 | `DRY_RUN` (default true), `HYPERLIQUID_LIVE_CONFIRMED` (default false) | engine | the two live gates |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_IDS` | monitor | optional; comma list. Secret `aether-telegram-bot-token` |
-| `MONITOR_WEBHOOK_URL`, `MONITOR_PING_URL`, `MONITOR_ALERT_COOLDOWN_S`, `MONITOR_ENV_LABEL` | monitor | see `engine/.env.monitor.example` |
+| `MONITOR_WEBHOOK_URL`, `MONITOR_PING_URL`, `MONITOR_ALERT_COOLDOWN_S`, `MONITOR_ENV_LABEL` | monitor | optional; configure in the root `.env` for local runs |
 
 `gcloud run jobs deploy --set-env-vars` replaces the full set. Change env only by editing and
 re-running `deploy/cloudrun.sh`, never in the console, or the next deploy silently drops it.
@@ -95,7 +95,7 @@ Envelopes are `v1.<iv>.<ct>.<tag>` (AES-256-GCM), with no key id, so rotation is
 3. Run a one-off script with `OLD_KEY` and `NEW_KEY` in env, using the service role: for each `broker_accounts` row,
    `decrypt` with the old key and `encrypt` with the new key (same functions as `engine/aether/crypto.py`), and update
    `agent_secret_enc` in one transaction per row. Verify every row decrypts with the NEW key before continuing.
-4. `gcloud secrets versions add aether-encryption-key --data-file=-` and update the web's `AETHER_ENCRYPTION_KEY`, then redeploy web.
+4. `gcloud secrets versions add aether-encryption-key --data-file=-` and update `API_ENCRYPTION_KEY` in the web app and Supabase executor, then redeploy both. Re-encrypt stored keys before retiring the previous key.
 5. Resume the executor and un-halt. Watch for `last_error` findings (decrypt failures). Destroy the old secret version.
 If the key leaked, rotating it is not enough: agent keys may be exposed. Have users re-connect (new agent, approveAgent)
 and revoke the old agents.

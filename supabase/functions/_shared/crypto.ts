@@ -12,8 +12,9 @@ function b64urlEncode(b: Uint8Array): string {
 }
 
 async function importKey(raw?: string): Promise<CryptoKey> {
-  const k = Uint8Array.from(atob(raw ?? env("AETHER_ENCRYPTION_KEY")), (c) => c.charCodeAt(0));
-  if (k.length !== 32) throw new Error("AETHER_ENCRYPTION_KEY must be 32 bytes, base64-encoded");
+  const configured = raw ?? (Deno.env.get("API_ENCRYPTION_KEY") || env("AETHER_ENCRYPTION_KEY"));
+  const k = Uint8Array.from(atob(configured), (c) => c.charCodeAt(0));
+  if (k.length !== 32) throw new Error("API_ENCRYPTION_KEY must be 32 bytes, base64-encoded");
   return await crypto.subtle.importKey("raw", k, "AES-GCM", false, ["encrypt", "decrypt"]);
 }
 
