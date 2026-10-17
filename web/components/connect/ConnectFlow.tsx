@@ -65,14 +65,6 @@ export function ConnectFlow() {
       const { data: auth } = await sb.auth.getUser();
       if (!auth.user) return fail("Your session expired. Sign in again and retry.");
 
-      const { data: existing } = await sb
-        .from("broker_accounts")
-        .select("id")
-        .eq("wallet_address", address.toLowerCase())
-        .eq("network", NETWORK)
-        .maybeSingle();
-      if (existing) return fail("This wallet already has a saved connection. Revoke it before creating a replacement.");
-
       // Create in this browser, encrypt to the executor's public key, and send only ciphertext.
       const agentKey = generatePrivateKey();
       const agent = privateKeyToAccount(agentKey);
