@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SignOutButton } from "@/components/app/AppNav";
 import { BrokerAccounts } from "@/components/connect/BrokerAccounts";
 import { ProfileForm, RiskForm, type Risk } from "@/components/settings/SettingsForms";
+import { TotpSettings } from "@/components/settings/TotpSettings";
 import { Card, CardHeader, ErrorNote, PageTitle, btn } from "@/components/ui";
 import { SELECT_BROKER, type BrokerAccount } from "@/components/types";
 import { requireUser } from "@/lib/supabase/server";
@@ -45,6 +46,10 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader title="Risk limits" sub="Applied to every account you own, on top of each strategy's stops." />
           {risk.error ? <div className="p-5"><ErrorNote message={risk.error.message} /></div> : <RiskForm initial={r} />}
+        </Card>
+        <Card>
+          <CardHeader title="Two-step verification" sub="Secure sign-in with an authenticator app." />
+          <TotpSettings />
         </Card>
         <Card className="lg:col-span-2">
           <CardHeader title="Connected wallets" action={<Link href="/connect" className={btn.small}>Connect another</Link>} />
