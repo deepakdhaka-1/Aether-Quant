@@ -74,10 +74,14 @@ export default function Landing() {
 
       {/* Story */}
       <section id="how" aria-labelledby="how-h" className="scroll-mt-16 border-t border-[#E3E8EA]">
-        <div className="mx-auto max-w-[1240px] px-4 pb-6 pt-20 sm:px-8">
-          <SectionHead id="how-h" kicker="How it works" title={<>One candle, <Em>all the way to an order.</Em></>}>
-            <p>Follow a single hour of NVIDIA&apos;s price as it becomes data, then a rule, then a trade on your account.</p>
-          </SectionHead>
+        <div className="mx-auto max-w-[1240px] px-4 pb-4 pt-14 text-center sm:px-8 sm:pt-16">
+          <p className="font-[family-name:var(--aq-mono)] text-[12px] uppercase tracking-[0.16em] text-[#1E6B62]">How it works</p>
+          <h2 id="how-h" className="mx-auto mt-3 max-w-[1000px] text-[clamp(2rem,4vw,3.5rem)] font-semibold leading-[1.03] tracking-[-0.045em] text-[#0C1A26]">
+            One candle, <span className="font-normal italic">all the way to an order.</span>
+          </h2>
+          <p className="mx-auto mt-3 max-w-[50rem] text-[clamp(0.95rem,1.1vw,1.05rem)] leading-relaxed text-[#5A6874]">
+            Follow a single hour of NVIDIA&apos;s price as it becomes data, then a rule, then a trade on your account.
+          </p>
         </div>
         <StoryLoader />
       </section>

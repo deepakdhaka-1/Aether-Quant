@@ -1,5 +1,6 @@
 // Backfill the latest 30 completed daily OHLCV candles for every supported Hyperliquid asset.
 import { createClient } from "jsr:@supabase/supabase-js@2.46.1";
+import { authorize } from "../_shared/db.ts";
 
 const DAY_MS = 86_400_000;
 const MARKETS = [
@@ -33,8 +34,11 @@ async function candleSnapshot(coin: string, startTime: number, endTime: number) 
   return await response.json() as HyperliquidCandle[];
 }
 
-// Public Deno handler: only refreshes a fixed allowlist from Hyperliquid into market_candles.
-Deno.serve(async () => {
+// Refreshes a fixed allowlist from Hyperliquid into market_candles. Platform JWT verification is
+// off (the anon key is a JWT too), so only the scheduler or the service role may trigger a run.
+Deno.serve(async (req: Request) => {
+  const denied = authorize(req);
+  if (denied) return denied;
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");

@@ -253,8 +253,7 @@ export default function MarketOrbit() {
         </div>
         <div className={`mt-8 grid grid-cols-2 gap-2 sm:grid-cols-4 ${reduced ? "" : "lg:hidden"}`}>
           {ASSETS.map((asset) => <div key={asset.ticker} className="flex items-center gap-2 rounded-xl border border-[#E7E7E4] bg-white p-3"><Logo asset={asset} size={28} /><div><p className="text-sm">{asset.name}</p><p className="font-[family-name:var(--aq-mono)] text-[10px] text-[#6B6F76]">{asset.ticker}</p></div></div>)}
-        </div>
-      </div>
+        </div>      </div>
     </section>
   );
 }
