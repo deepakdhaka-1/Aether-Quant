@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LayoutDashboard, LineChart, LogOut, Plug, Settings, Shield } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -16,11 +16,11 @@ const NAV = [
 ];
 
 export function useSignOut() {
-  const router = useRouter();
   return async () => {
-    await supabaseBrowser().auth.signOut();
-    router.replace("/");
-    router.refresh();
+    await fetch("/api/auth/signout", { method: "POST" }).catch(() => undefined);
+    await supabaseBrowser().auth.signOut({ scope: "local" }).catch(() => undefined);
+    // Full reload so no cached server-rendered page keeps showing the signed-in state.
+    window.location.replace("/");
   };
 }
 

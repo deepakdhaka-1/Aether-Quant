@@ -336,7 +336,7 @@ async function openEntry(ctx: Ctx, sub: Row, strat: Row, coin: string, desired: 
   const mid = await ctx.hl.mid(coin);
   let notional = pot * Number(sub.allocation_pct) * lev;
   // Fit free collateral instead of sending an order the venue refuses every pass.
-  const free = Object.keys(state.pots).length ? (state.withdrawable[coin.includes(":") ? coin.split(":")[0] : ""] ?? 0) : state.equity;
+  const free = Object.keys(state.pots).length ? (state.withdrawable[coin.includes(":") ? coin.split(":")[0] : ""] ?? 0) : (state.withdrawable[""] ?? 0);
   const cap = free * envNum("FREE_COLLATERAL_USE", 0.9) * lev;
   if (notional > cap) notional = cap;
   const qty = notional / mid;

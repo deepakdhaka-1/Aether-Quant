@@ -148,8 +148,10 @@ class HyperliquidAccount:
         try:
             if self.info.post("/info", {"type": "userAbstraction", "user": self.user}) == "unifiedAccount":
                 spot = self.info.post("/info", {"type": "spotClearinghouseState", "user": self.user}) or {}
+                # Spot USDC `total` is already marked to market (`hold` = margin incl. unrealized PnL),
+                # so it IS the equity; adding unrealized PnL again would double-count it.
                 usdc = sum(float(b["total"]) for b in spot.get("balances", []) if b.get("coin") == "USDC")
-                equity, pots = usdc + sum(p.unrealized_pnl for p in positions), {}
+                equity, pots = usdc, {}
         except Exception as e:
             log.warning("abstraction read failed for %s: %s (using per-dex sum)", self.user, e)
         return HLAccount(equity=equity, pots=pots, positions=positions)

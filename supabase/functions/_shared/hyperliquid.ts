@@ -45,7 +45,7 @@ export interface Position {
 export interface AccountState {
   equity: number;
   pots: Record<string, number>; // {"": perps, "xyz": xyz}; empty when unified
-  withdrawable: Record<string, number>;
+  withdrawable: Record<string, number>; // per pot; {"": free USDC} when unified
   positions: Position[];
 }
 
@@ -284,14 +284,18 @@ export class HyperliquidAccount {
     const positions = [...HyperliquidAccount.parse(perp), ...HyperliquidAccount.parse(xyz)];
     let equity = pe + xe;
     let pots: Record<string, number> = { "": pe, [this.dex]: xe };
-    const withdrawable = { "": Number(perp.withdrawable || 0), [this.dex]: Number(xyz.withdrawable || 0) };
+    let withdrawable: Record<string, number> = { "": Number(perp.withdrawable || 0), [this.dex]: Number(xyz.withdrawable || 0) };
     try {
       const abs = await info<string>({ type: "userAbstraction", user: this.user }, this.baseUrl);
       if (abs === "unifiedAccount") {
         // deno-lint-ignore no-explicit-any
         const spot = await info<any>({ type: "spotClearinghouseState", user: this.user }, this.baseUrl);
-        const usdc = (spot?.balances || []).filter((b: { coin: string }) => b.coin === "USDC").reduce((s: number, b: { total: string }) => s + Number(b.total), 0);
-        equity = usdc + positions.reduce((s, p) => s + p.unrealized_pnl, 0);
+        // Spot USDC `total` is already marked to market (`hold` = margin incl. unrealized PnL), so it
+        // IS the equity; adding unrealized PnL again double-counts it. Free = total - hold.
+        const usdc = (spot?.balances || []).filter((b: { coin: string }) => b.coin === "USDC");
+        equity = usdc.reduce((s: number, b: { total: string }) => s + Number(b.total), 0);
+        const hold = usdc.reduce((s: number, b: { hold?: string }) => s + Number(b.hold || 0), 0);
+        withdrawable = { "": Math.max(0, equity - hold) };
         pots = {};
       }
     } catch (_e) { /* abstraction unknown: per-dex sum stands */ }

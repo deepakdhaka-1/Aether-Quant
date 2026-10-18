@@ -7,13 +7,11 @@ export async function encryptAgentKey(privateKey: `0x${string}`): Promise<string
 
   const binary = atob(encodedKey.replace(/-/g, "+").replace(/_/g, "/"));
   const spki = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-  const publicKey = await crypto.subtle.importKey(
-    "spki",
-    spki,
-    { name: "RSA-OAEP", hash: "SHA-256" },
-    false,
-    ["encrypt"],
-  );
+  const publicKey = await crypto.subtle
+    .importKey("spki", spki, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["encrypt"])
+    .catch(() => {
+      throw new Error("Agent encryption public key is invalid (expected base64 DER SPKI RSA key, see docs/AGENT_KEY_ENCRYPTION.md)");
+    });
   const ciphertext = await crypto.subtle.encrypt(
     { name: "RSA-OAEP" },
     publicKey,

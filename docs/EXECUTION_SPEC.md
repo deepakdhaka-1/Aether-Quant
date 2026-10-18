@@ -84,7 +84,8 @@ Errors inside one account never stop the pass: record `broker_accounts.last_erro
 - **Collateral pots.** On a classic account, standard perps and the HIP-3 `xyz` dex hold SEPARATE
   collateral: size against the pot the coin trades from (`clearinghouseState` with and without
   `"dex":"xyz"`). On a unified account (`info {"type":"userAbstraction"} == "unifiedAccount"`), equity is
-  spot USDC + unrealized PnL and is shared.
+  spot USDC `total` (already marked to market; do not add unrealized PnL) and is shared; free
+  collateral is `total - hold`.
 - **Partial reads are fatal for the pass**: if the `xyz` clearinghouse read fails, raise (a half read
   looks like a drawdown and would trip the risk halt).
 - **Fit free collateral**: if notional exceeds free margin x 0.9 x exchange leverage, shrink the order to
