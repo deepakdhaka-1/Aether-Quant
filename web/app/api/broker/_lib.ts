@@ -35,7 +35,8 @@ export async function ownedAccount(id: unknown): Promise<{ row: BrokerRow; userI
   const { user, sb } = await requireUser();
   if (!user) return { error: json({ error: "sign in first" }, 401) };
   if (typeof id !== "string" || !id) return { error: json({ error: "broker_account_id required" }, 400) };
-  const { data } = await sb.from("broker_accounts").select(COLS).eq("id", id).maybeSingle();
+  const { data, error } = await sb.from("broker_accounts").select(COLS).eq("id", id).maybeSingle();
+  if (error) return { error: json({ error: `Could not load this connection: ${error.message}` }, 500) };
   if (!data || data.user_id !== user.id) return { error: json({ error: "broker account not found" }, 404) };
   return { row: data as BrokerRow, userId: user.id, sb };
 }
