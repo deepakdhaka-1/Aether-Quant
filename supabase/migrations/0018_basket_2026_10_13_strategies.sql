@@ -2,6 +2,10 @@
 -- Strategies whose symbol is not in markets are skipped (insert the market first, then re-run).
 -- Inserted as draft. headline_metrics is pre-filled so the signal runner keeps these backtests.
 
+insert into markets (symbol, name, asset_class, hl_coin) values
+  ('PALLADIUM','Palladium','commodity','xyz:PALLADIUM')
+on conflict (symbol) do nothing;
+
 -- id138 NVDA_15min_CCI_PanicDip_long
 with s as (
   insert into strategies (slug,name,description,symbol,timeframe,direction,entry_long,exit_long,entry_short,exit_short,
